@@ -1,6 +1,7 @@
 //-----------------------------------------------------------------------------
 // - Render 2 triangles to create quad
 // - add wireframe key toggling
+// - add index buffer
 //-----------------------------------------------------------------------------
 
 #include <iostream> // Deals with input/output
@@ -18,14 +19,14 @@ GLFWwindow* gmainWindow;
 bool gWireframe = false;
 
 // Shaders
-// 3.1 Get the shader (usully from file), but for now it's just an array of chars
+
 const GLchar* vertexShaderSrc =
 "#version 330 core\n"
 "layout (location = 0) in vec3 pos;"
 "void main() {"
 "	gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);"
 "}";
-// 4.1 Get the shader (usully from file), but for now it's just an array of chars
+
 const GLchar* fragmentShaderSrc =
 "#version 330 core\n"
 "out vec4 fragColor;"
@@ -48,23 +49,23 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	// 1. setup array of vertices for triangle
+	// 1. setup array of vertices for Quad (2 Triangles), but with no repetion in the vertices
 	GLfloat vertices[] = {
 		// Positions
-
-		// first triangle
 		-0.5, 0.5f, 0.0f,	// top left
 		0.5f, 0.5f, 0.0f,	// top right 
-		0.5f, -0.5f, 0.0f,	// buttom right
-
-		// second triangle
-		-0.5, 0.5f, 0.0f,	// top left
 		0.5f, -0.5f, 0.0f,	// buttom right
 		-0.5f, -0.5f, 0.0f,	// buttom left
 	};
 
-	// 2. setup buffers on the GPU
-	GLuint vbo, vao;
+	// 2. creat the indices buffer, to reuse each point
+	GLuint indices[] = {
+		0,1,2,	// first triangle
+		0,2,3,	// second triangle
+	};
+
+	// setup buffers on the GPU
+	GLuint vbo, vao, ibo; // ibo -> index / element buffer object
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // make it as working buffer (Active it)
@@ -76,17 +77,17 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0); // Position
 	glEnableVertexAttribArray(0);
 
-	// Note:
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
-	//-------------------------------------------------^---this could be also as (sizeof(GLfloat) * 3)
-	//-----------------------------------------------------cuz there is one data only in the array (tightly binded)
+	// 3. setup index buffer
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// 3.0 create vertix shader
+	// create vertix shader
 	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vs, 1, &vertexShaderSrc, NULL);
 	glCompileShader(vs);
 
-	// 3.2 check for compile errors in vertex shaders code
+	// check for compile errors in vertex shaders code
 	GLint vsResult;
 	GLchar vsInfoLog[512];
 	glGetShaderiv(vs, GL_COMPILE_STATUS, &vsResult);
@@ -95,12 +96,12 @@ int main() {
 		cerr << "Error: Vertex shader failed to compile." << vsInfoLog << endl;
 	}
 
-	// 4.0 Creat fragment shader
+	// Creat fragment shader
 	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fs, 1, &fragmentShaderSrc, NULL);
 	glCompileShader(fs);
 
-	// 4.2 check for compile errors in fragment shaders code
+	// Check for compile errors in fragment shaders code
 	GLint fsResult;
 	GLchar fsInfoLog[512];
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &fsResult);
@@ -109,13 +110,13 @@ int main() {
 		cerr << "Error: Fragment shader failed to compile." << fsInfoLog << endl;
 	}
 
-	// 5. Create shader program and link our vertex and fragment shaders
+	// Create shader program and link our vertex and fragment shaders
 	GLint shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vs);
 	glAttachShader(shaderProgram, fs);
 	glLinkProgram(shaderProgram);
 
-	// 5.1 Check for error in shader program
+	// Check for error in shader program
 	GLint progResult;
 	GLchar progInfoLog[512];
 	glGetShaderiv(shaderProgram, GL_LINK_STATUS, &progResult);
@@ -124,7 +125,7 @@ int main() {
 		cerr << "Error: Shader program failed to link." << progInfoLog << endl;
 	}
 
-	// 6. Clean up shaders (we do not need them any more)
+	// Clean up shaders (we do not need them any more)
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
@@ -135,10 +136,15 @@ int main() {
 
 		//=====================Drawing area=====================//
 		glClear(GL_COLOR_BUFFER_BIT);
-		// 7. Draw (Bind ==> Draw ==> Unbind)
+		// Draw (Bind ==> Draw ==> Unbind)
 		glUseProgram(shaderProgram);
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		// old way drawing
+		// glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// new way drawing not cuz now we are not using the (array buffer), but (it's index /element buffer)
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,0);
+
 		glBindVertexArray(0);
 		//=====================Drawing area=====================//
 
