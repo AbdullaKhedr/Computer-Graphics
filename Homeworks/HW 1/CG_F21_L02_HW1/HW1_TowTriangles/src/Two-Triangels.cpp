@@ -47,8 +47,10 @@ void glfw_onFrameBufferSize(GLFWwindow* window, int width, int height);
 //-----------------------------------------------------------------------------
 // Main Application Entry Point
 //-----------------------------------------------------------------------------
-int main() {
-	if (!initOpenGL()) {
+int main() 
+{
+	if (!initOpenGL()) 
+	{
 		cout << "Failed to init OpenGL" << endl;
 		return EXIT_FAILURE;
 	}
@@ -56,16 +58,16 @@ int main() {
 	// 1. setup array of vertices for the two triangles
 	GLfloat vertices1[] = {
 		// Positions			// Colors
-		0.5f, 0.5f, 0.0f,		1.0f, 0.0f,0.0f,	//top
-		1.0f, -0.5f, 0.0f,		0.0f, 1.0f,0.0f,	//right
-		0.0f, -0.5f, 0.0f,		0.0f, 0.0f,1.0f,	// left
+		0.45f, 0.5f, 0.0f,		0.0f, 1.0f,1.0f,	//top
+		0.9f, -0.5f, 0.0f,		0.0f, 1.0f,1.0f,	//right
+		0.0f, -0.5f, 0.0f,		0.0f, 1.0f,1.0f,	// left
 	};
 
 	GLfloat vertices2[] = {
 		// Positions			// Colors
-		-0.5f, 0.5f, 0.0f,		1.0f, 0.0f,0.0f,	//top
-		0.0f, -0.5f, 0.0f,		0.0f, 1.0f,0.0f,	//right
-		-1.0f, -0.5f, 0.0f,		0.0f, 0.0f,1.0f,	// left
+		-0.45f, 0.5f, 0.0f,		1.0f, 1.0f, 0.0f,	//top
+		0.0f, -0.5f, 0.0f,		1.0f, 1.0f, 0.0f,	//right
+		-0.9f, -0.5f, 0.0f,		1.0f, 1.0f, 0.0f,	// left
 	};
 
 	// 2. setup buffers on the GPU
@@ -105,7 +107,8 @@ int main() {
 	GLint vsResult;
 	GLchar vsInfoLog[512];
 	glGetShaderiv(vs, GL_COMPILE_STATUS, &vsResult);
-	if (!vsResult) {
+	if (!vsResult) 
+	{
 		glGetShaderInfoLog(vs, sizeof(vsInfoLog), NULL, vsInfoLog);
 		cerr << "Error: Vertex shader failed to compile." << vsInfoLog << endl;
 	}
@@ -119,7 +122,8 @@ int main() {
 	GLint fsResult;
 	GLchar fsInfoLog[512];
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &fsResult);
-	if (!fsResult) {
+	if (!fsResult) 
+	{
 		glGetShaderInfoLog(fs, sizeof(fsInfoLog), NULL, fsInfoLog);
 		cerr << "Error: Fragment shader failed to compile." << fsInfoLog << endl;
 	}
@@ -134,7 +138,8 @@ int main() {
 	GLint progResult;
 	GLchar progInfoLog[512];
 	glGetShaderiv(shaderProgram, GL_LINK_STATUS, &progResult);
-	if (!progResult) {
+	if (!progResult) 
+	{
 		glGetShaderInfoLog(shaderProgram, sizeof(progInfoLog), NULL, progInfoLog);
 		cerr << "Error: Shader program failed to link." << progInfoLog << endl;
 	}
@@ -144,7 +149,8 @@ int main() {
 	glDeleteShader(fs);
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
-	while (!glfwWindowShouldClose(gmainWindow)) {
+	while (!glfwWindowShouldClose(gmainWindow)) 
+	{
 		// Get + Handel user input events
 		glfwPollEvents();
 
@@ -152,12 +158,12 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		// 7. Draw (Bind ==> Draw ==> Unbind)
 		glUseProgram(shaderProgram);
-		glBindVertexArray(vao1);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(vao1); // ==> Bind
+		glDrawArrays(GL_TRIANGLES, 0, 3); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind
 		
-		glBindVertexArray(vao2);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(vao2); // ==> Bind
+		glDrawArrays(GL_TRIANGLES, 0, 3); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind
 		//=====================Drawing area=====================//
 
@@ -177,7 +183,8 @@ int main() {
 }
 
 // OpenGL Initiolization
-bool initOpenGL() {
+bool initOpenGL() 
+{
 	// init glfw
 	if (!glfwInit())
 	{
@@ -230,12 +237,15 @@ bool initOpenGL() {
 // ##### Callback Functions ##### //
 
 // Handel keyboard
-void glfwOnKey(GLFWwindow* window, int key, int scancode, int action, int mode) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+void glfwOnKey(GLFWwindow* window, int key, int scancode, int action, int mode) 
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) 
+	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
-	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_W && action == GLFW_PRESS) 
+	{
 		gWireframe = !gWireframe; //toggele it
 
 		if (gWireframe)
@@ -246,13 +256,15 @@ void glfwOnKey(GLFWwindow* window, int key, int scancode, int action, int mode) 
 }
 
 // Handel resize window
-void glfw_onFrameBufferSize(GLFWwindow* window, int width, int height) {
+void glfw_onFrameBufferSize(GLFWwindow* window, int width, int height) 
+{
 	glViewport(0, 0, width, height);
 }
 
 
 // Print OpenGL version information
-void print_OpenGL_Info() {
+void print_OpenGL_Info() 
+{
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	const GLubyte* vendor = glGetString(GL_VENDOR);
 	const GLubyte* version = glGetString(GL_VERSION);
