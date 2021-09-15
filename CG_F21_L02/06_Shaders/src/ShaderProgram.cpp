@@ -46,7 +46,7 @@ bool ShaderProgram::loadShaders(const char* vsFileName, const char* fsFileName)
 	glAttachShader(mHandle, vs);
 	glAttachShader(mHandle, fs);
 	glLinkProgram(mHandle);
-	checkCompileErrors(mHandle, PROGRAM);	
+	checkCompileErrors(mHandle, PROGRAM);
 
 	// Clean up shaders (we do not need them any more)
 	glDeleteShader(vs);
@@ -92,7 +92,7 @@ void ShaderProgram::checkCompileErrors(GLuint shader, ShaderType type)
 	if (type == PROGRAM) // Errors in the program
 	{
 		glGetShaderiv(mHandle, GL_LINK_STATUS, &status);
-		if (status == GL_FALSE) 
+		if (status == GL_FALSE)
 		{
 			// we will get the length of the error first, instead of using fixed lenght
 			GLint length = 0;
@@ -104,9 +104,9 @@ void ShaderProgram::checkCompileErrors(GLuint shader, ShaderType type)
 		}
 	}
 	else // Errors in vertix or fagment shaders
-	{ 
+	{
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-		if (status == GL_FALSE) 
+		if (status == GL_FALSE)
 		{
 			// we will get the length of the error first, instead of using fixed lenght
 			GLint length = 0;
@@ -116,5 +116,35 @@ void ShaderProgram::checkCompileErrors(GLuint shader, ShaderType type)
 			glGetShaderInfoLog(shader, sizeof(length), &length, &errorLog[0]);
 			cerr << "Error: Vertex shader failed to compile." << errorLog << endl;
 		}
-	}	
+	}
+}
+
+GLint ShaderProgram::getUniformLocation(const GLchar* name)
+{
+	std::map<string, GLint>::iterator it = mUniformLocation.find(name);
+
+	// if no location for that name
+	if (it == mUniformLocation.end())
+	{
+		mUniformLocation[name] = glGetUniformLocation(mHandle, name);
+	}
+
+	// if we found the name ==> return the location
+	return mUniformLocation[name];
+}
+
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec2& v) 
+{
+	GLint loc = getUniformLocation(name);
+	glUniform2f(loc, v.x, v.y);
+}
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec3& v) 
+{
+	GLint loc = getUniformLocation(name);
+	glUniform3f(loc, v.x, v.y, v.z);
+}
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec4& v)
+{
+	GLint loc = getUniformLocation(name);
+	glUniform4f(loc, v.x, v.y, v.z, v.w);
 }

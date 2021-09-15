@@ -5,6 +5,8 @@
 #define GLEW_STATIC 
 #include "GL/glew.h"
 #include "string"
+#include "glm/glm.hpp"
+#include <map>
 
 using namespace std;
 
@@ -27,10 +29,18 @@ public:
 	void use();
 	GLuint getProgram() const;
 
+	void setUniform(const GLchar* name, const glm::vec2& v);
+	void setUniform(const GLchar* name, const glm::vec3& v);
+	void setUniform(const GLchar* name, const glm::vec4& v);
+
 private:
 	GLuint mHandle; // The Program itself
 	string fileToString(const string& fileName);
 	void checkCompileErrors(GLuint shader, ShaderType type);
+
+	// Got the name and returns the location
+	GLint getUniformLocation(const GLchar* name);
+	std::map<string, GLint> mUniformLocation;
 };
 
 

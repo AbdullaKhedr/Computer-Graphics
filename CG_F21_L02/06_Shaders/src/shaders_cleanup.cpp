@@ -69,7 +69,7 @@ int main() {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	ShaderProgram shaderProgram;
-	shaderProgram.loadShaders("shaders/basic.vert","shaders/basic.frag");
+	shaderProgram.loadShaders("shaders/basic.vert", "shaders/basic.frag");
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
 	while (!glfwWindowShouldClose(gmainWindow)) {
@@ -78,15 +78,20 @@ int main() {
 
 		//=====================Drawing area (Bind ==> Draw ==> Unbind) =====================//
 		glClear(GL_COLOR_BUFFER_BIT);
+
 		shaderProgram.use();
+
+		// create uniform variables
+		GLfloat time = (GLfloat)glfwGetTime();
+		GLfloat greenColor = (sin(time) / 2) + 0.5;
+		//GLint vertexColor = glGetUniformLocation(shaderProgram.getProgram(), "vertColor");
+		//glUniform4f(vertexColor, 0.0f, greenColor, 0.0f, 1.0f);
+		shaderProgram.setUniform("vertColor", glm::vec4(0.0f, greenColor, 0.0f, 1.0f));
+
+
 		glBindVertexArray(vao);
-		// old way drawing
-		// glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		// new way drawing not cuz now we are not using the (array buffer), but (it's index /element buffer)
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-		glBindVertexArray(0);
+		glBindVertexArray(0); // ==> unbind vao
 		//=====================Drawing area=====================//
 
 		// Swap the screen buffers (DOUBLE BUFFER CONCEPT)
@@ -94,7 +99,7 @@ int main() {
 	}
 
 	// Clean up
-	
+
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 	glfwTerminate();
