@@ -1,13 +1,14 @@
 //-----------------------------------------------------------------------------
 // - Render 2 triangles beside each other
 // - One VBO with position and color for each triangle
-// - add wireframe key toggling
+// - Wireframe key toggling (Press W Key)
 //-----------------------------------------------------------------------------
 
 #include <iostream> // Deals with input/output
 #define GLEW_STATIC // Important to be static
 #include "GL/glew.h" // include glew before glfw
 #include "GLFW/glfw3.h"
+#include "ShaderProgram.h"
 
 using namespace std;
 
@@ -17,26 +18,6 @@ const int gWindowWidth = 800;
 const int gWindowHeight = 600;
 GLFWwindow* gmainWindow;
 bool gWireframe = false;
-
-// Shaders
-// 3.1 Get the shader (usully from file), but for now it's just an array of chars
-const GLchar* vertexShaderSrc =
-"#version 330 core\n"
-"layout (location = 0) in vec3 pos;"
-"layout (location = 1) in vec3 color;"
-"out vec3 vertColor;"
-"void main() {"
-"	vertColor = color;"
-"	gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);"
-"}";
-// 4.1 Get the shader (usully from file), but for now it's just an array of chars
-const GLchar* fragmentShaderSrc =
-"#version 330 core\n"
-"in vec3 vertColor;"
-"out vec4 fragColor;"
-"void main() {"
-"	fragColor = vec4(vertColor, 1.0);"
-"}";
 
 // Functions Prototypes
 bool initOpenGL();
@@ -98,55 +79,9 @@ int main()
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
-	// 3.0 create vertix shader
-	GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vs, 1, &vertexShaderSrc, NULL);
-	glCompileShader(vs);
-
-	// 3.2 check for compile errors in vertex shaders code
-	GLint vsResult;
-	GLchar vsInfoLog[512];
-	glGetShaderiv(vs, GL_COMPILE_STATUS, &vsResult);
-	if (!vsResult) 
-	{
-		glGetShaderInfoLog(vs, sizeof(vsInfoLog), NULL, vsInfoLog);
-		cerr << "Error: Vertex shader failed to compile." << vsInfoLog << endl;
-	}
-
-	// 4.0 Creat fragment shader
-	GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fs, 1, &fragmentShaderSrc, NULL);
-	glCompileShader(fs);
-
-	// 4.2 check for compile errors in fragment shaders code
-	GLint fsResult;
-	GLchar fsInfoLog[512];
-	glGetShaderiv(fs, GL_COMPILE_STATUS, &fsResult);
-	if (!fsResult) 
-	{
-		glGetShaderInfoLog(fs, sizeof(fsInfoLog), NULL, fsInfoLog);
-		cerr << "Error: Fragment shader failed to compile." << fsInfoLog << endl;
-	}
-
-	// 5. Create shader program and link our vertex and fragment shaders
-	GLint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vs);
-	glAttachShader(shaderProgram, fs);
-	glLinkProgram(shaderProgram);
-
-	// 5.1 Check for error in Program
-	GLint progResult;
-	GLchar progInfoLog[512];
-	glGetShaderiv(shaderProgram, GL_LINK_STATUS, &progResult);
-	if (!progResult) 
-	{
-		glGetShaderInfoLog(shaderProgram, sizeof(progInfoLog), NULL, progInfoLog);
-		cerr << "Error: Shader program failed to link." << progInfoLog << endl;
-	}
-
-	// 6. Clean up shaders (we do not need them any more)
-	glDeleteShader(vs);
-	glDeleteShader(fs);
+	// 3. Get vertix & fragment shaders
+	ShaderProgram shaderProgram;
+	shaderProgram.loadShaders("shaders/basic.vert", "shaders/basic.frag");
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
 	while (!glfwWindowShouldClose(gmainWindow)) 
@@ -156,8 +91,11 @@ int main()
 
 		//=====================Drawing area=====================//
 		glClear(GL_COLOR_BUFFER_BIT);
-		// 7. Draw (Bind ==> Draw ==> Unbind)
-		glUseProgram(shaderProgram);
+
+		// 4. Use the program
+		shaderProgram.use();
+
+		// 5. Draw (Bind ==> Draw ==> Unbind)
 		glBindVertexArray(vao1); // ==> Bind
 		glDrawArrays(GL_TRIANGLES, 0, 3); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind
@@ -172,7 +110,6 @@ int main()
 	}
 
 	// Clean up
-	glDeleteProgram(shaderProgram);
 	glDeleteVertexArrays(1, &vao1);
 	glDeleteVertexArrays(1, &vao2);
 	glDeleteBuffers(1, &vbo1);
@@ -229,7 +166,6 @@ bool initOpenGL()
 
 	// Print OpenGL info
 	print_OpenGL_Info();
-
 
 	return true;
 }
