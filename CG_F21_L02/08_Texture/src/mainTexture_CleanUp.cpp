@@ -8,20 +8,21 @@
 #define GLEW_STATIC // Important to be static
 #include "GL/glew.h" // include glew before glfw
 #include "GLFW/glfw3.h"
-#include "ShaderProgram.h"
 
-// Image loader
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image/stb_image.h";
+#include "ShaderProgram.h"
+#include"Texture.h"
 
 using namespace std;
 
 // Global Variables
-const char* APP_TITLE = "Computer Graphics - Texture 1 (Basic)";
+const char* APP_TITLE = "Computer Graphics - Texture 2 (Basic)";
 const int gWindowWidth = 800;
 const int gWindowHeight = 600;
 GLFWwindow* gmainWindow;
 bool gWireframe = false;
+
+const string texture1FileName = "res/images/image1.jpg";
+const string texture2FileName = "res/images/mario.png";
 
 // Functions Prototypes
 bool initOpenGL();
@@ -79,51 +80,11 @@ int main() {
 	ShaderProgram shaderProgram;
 	shaderProgram.loadShaders("res/shaders/basic.vert", "res/shaders/basic.frag");
 
-	// *********************
-	// ****** Texture ******
-	// *********************
-	GLuint texture1;
-	GLint width, height, bitdepth; // bitdepth is the number of components in each pixel
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	// set texture parameters warp 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture parameters filter
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// Load image and create texture
-	unsigned char* texelData = stbi_load("res/images/image1.jpg", &width, &height, &bitdepth, 0);
-	if (!texelData)
-	{
-		cerr << "Fail to load image file" << endl;
-	}
-
-	GLenum format = 0;
-	switch (bitdepth)
-	{
-	case 0:
-		format = GL_RED;
-	case 3:
-		format = GL_RGB;
-	case 4:
-		format = GL_RGBA;
-	default:
-		format = 0;
-		cerr << "Error: Unkowen bitdepth!" << endl;
-		break;
-	}
+	Texture texture1;
+	texture1.loadTexture(texture1FileName, true);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, texelData);
-	//glGenerateMipmap(GL_TEXTURE_2D);
-	stbi_image_free(texelData);
-
-	// set the texute and render ** binding
-	shaderProgram.use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
-
+	Texture texture2;
+	texture2.loadTexture(texture2FileName, true);
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
 	while (!glfwWindowShouldClose(gmainWindow)) {
@@ -135,11 +96,16 @@ int main() {
 
 		shaderProgram.use();
 
-		// create uniform variables
-		GLfloat time = (GLfloat)glfwGetTime();
-		GLfloat greenColor = (sin(time) / 2) + 0.5;
-		//shaderProgram.setUniform("vertColor", glm::vec4(0.0f, greenColor, 0.0f, 1.0f));
+		texture1.bind(0);
+		texture2.bind(1);
+		// if more than 1 texture we need this
+		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
+		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
 
+		// create uniform variables
+		//GLfloat time = (GLfloat)glfwGetTime();
+		//GLfloat greenColor = (sin(time) / 2) + 0.5;
+		//shaderProgram.setUniform("vertColor", glm::vec4(0.0f, greenColor, 0.0f, 1.0f));
 
 		glBindVertexArray(vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

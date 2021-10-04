@@ -21,11 +21,19 @@
   <ItemGroup>
     <ClCompile Include="src\mainTexture_CleanUp.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ShaderProgram.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="src\Texture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\images\image1.jpg" />
+    <Image Include="res\images\mario.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\basic.frag" />
+    <None Include="res\shaders\basic.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
