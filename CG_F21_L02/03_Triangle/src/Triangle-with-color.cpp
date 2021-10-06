@@ -69,6 +69,30 @@ int main() {
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao); // make as active one
+	
+	// Most Important function
+	// glVertexAttribPointer(layout index, size, type, normalize, stride, offset)
+	// LAYOUT:
+	// the layout must match the one you spicefed in the vertex shaders
+	// SIZE:
+	// the size of the data (x,y,z) or (R,G,B) ==> 3
+	// TYPE:
+	// data type is float
+	// NORMALIZE:
+	// false == the data is normalized (no need for normalization)
+	// true == the data need to be normalized
+	// STRIDE:
+	// Each vertix from the array of vertices noe has a pos(x,y,z) and color (R,G,B)
+	// and the type is float, so each component has 4 BYTES , so the pos is 3*4 = 12 , or 3 * sizeof(GL_float)
+	// allso the same for color (R,G,B) 3 components * 4 BYTES = 12 BYTES
+	// So in total the ONE vertex will have vertex and color fo it 
+	// which result on (3 components for pos + 3 components for color) * sizeof(GL_float) ===> 6*sizeof(GL_float)
+	// OFFSET:
+	// each vertex has a pos and color.
+	// we puted the pos data first, so the offset for it will start from zero
+	// then color data comes, so it will be after 3 the components of the pos.
+	// NOTE: if the data contains only pos or only color, then no need for the offset.
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0); // Position
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(sizeof(GLfloat) * 3)); // Color
 
