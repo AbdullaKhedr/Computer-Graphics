@@ -4,7 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION // cuz it is header file type library
 #include "stb_image/stb_image.h";
 
-Texture::Texture() 
+Texture::Texture()
 	:mTexture(0)
 {
 
@@ -18,7 +18,7 @@ Texture::~Texture()
 bool Texture::loadTexture(const string& fileName, bool generateMipMaps)
 {
 	GLint width, height, nrComponent;
-	
+
 	glGenTextures(1, &mTexture);
 	glBindTexture(GL_TEXTURE_2D, mTexture);
 	// set texture parameters warp 
@@ -27,16 +27,16 @@ bool Texture::loadTexture(const string& fileName, bool generateMipMaps)
 	// set texture parameters filter
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
+
 	// Load image and create texture
 	unsigned char* texelData = stbi_load(fileName.c_str(), &width, &height, &nrComponent, 0);
 	if (!texelData)
 	{
-		printf("Fail to load image file %s \n",fileName.c_str());
+		printf("Fail to load image file %s \n", fileName.c_str());
 	}
 
 	GLenum format = 0;
-	if(nrComponent == 0)
+	if (nrComponent == 0)
 		format = GL_RED;
 	if (nrComponent == 3)
 		format = GL_RGB;
@@ -45,10 +45,11 @@ bool Texture::loadTexture(const string& fileName, bool generateMipMaps)
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, texelData);
 
-	if(generateMipMaps)
-	glGenerateMipmap(GL_TEXTURE_2D);
-	
+	if (generateMipMaps)
+		glGenerateMipmap(GL_TEXTURE_2D);
+
 	stbi_image_free(texelData);
+	glBindTexture(GL_TEXTURE_2D, 2); // unbind
 
 	return true;
 }

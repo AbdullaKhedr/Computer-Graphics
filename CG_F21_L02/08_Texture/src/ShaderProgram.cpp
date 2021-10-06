@@ -133,12 +133,12 @@ GLint ShaderProgram::getUniformLocation(const GLchar* name)
 	return mUniformLocation[name];
 }
 
-void ShaderProgram::setUniform(const GLchar* name, const glm::vec2& v) 
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec2& v)
 {
 	GLint loc = getUniformLocation(name);
 	glUniform2f(loc, v.x, v.y);
 }
-void ShaderProgram::setUniform(const GLchar* name, const glm::vec3& v) 
+void ShaderProgram::setUniform(const GLchar* name, const glm::vec3& v)
 {
 	GLint loc = getUniformLocation(name);
 	glUniform3f(loc, v.x, v.y, v.z);

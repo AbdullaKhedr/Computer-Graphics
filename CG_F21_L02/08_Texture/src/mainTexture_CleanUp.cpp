@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// mainTexture_01.cpp
+// mainTexture_02.cpp - Clean up
 // create texture
 // modify shaders to handle texture
 //-----------------------------------------------------------------------------
@@ -8,7 +8,6 @@
 #define GLEW_STATIC // Important to be static
 #include "GL/glew.h" // include glew before glfw
 #include "GLFW/glfw3.h"
-
 #include "ShaderProgram.h"
 #include"Texture.h"
 
@@ -67,7 +66,7 @@ int main() {
 	// positions
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)0); // Position
 	glEnableVertexAttribArray(0);
-	
+
 	// texture
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)(3 * sizeof(GLfloat))); // texture
 	glEnableVertexAttribArray(1);
@@ -82,7 +81,7 @@ int main() {
 
 	Texture texture1;
 	texture1.loadTexture(texture1FileName, true);
-	
+
 	Texture texture2;
 	texture2.loadTexture(texture2FileName, true);
 
@@ -98,7 +97,7 @@ int main() {
 
 		texture1.bind(0);
 		texture2.bind(1);
-		// if more than 1 texture we need this
+		// if more than 1 texture we need this (like this case)
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
 
