@@ -40,7 +40,7 @@ private:
 
 	// Got the name and returns the location
 	GLint getUniformLocation(const GLchar* name);
-	std::map<string, GLint> mUniformLocation;
+	map<string, GLint> mUniformLocation;
 };
 
 

@@ -84,8 +84,8 @@ int main() {
 		// create uniform variables
 		GLfloat time = (GLfloat)glfwGetTime();
 		GLfloat greenColor = (sin(time) / 2) + 0.5;
-		//GLint vertexColor = glGetUniformLocation(shaderProgram.getProgram(), "vertColor");
-		//glUniform4f(vertexColor, 0.0f, greenColor, 0.0f, 1.0f);
+		//GLint vertexColor = glGetUniformLocation(shaderProgram.getProgram(), "vertColor"); // XXX old way
+		//glUniform4f(vertexColor, 0.0f, greenColor, 0.0f, 1.0f); // XXX old way
 		shaderProgram.setUniform("vertColor", glm::vec4(0.0f, greenColor, 0.0f, 1.0f));
 
 
