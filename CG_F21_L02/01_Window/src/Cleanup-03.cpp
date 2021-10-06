@@ -1,7 +1,10 @@
 //-----------------------------------------------------------------------------
 // 1. Creates a basic window and OpenGL 3.3 context using GLFW.
+// 2. Implement printOpenGLInfo() function to print OpenGL Information.
+// 3. Implement an OnCLick listener to close the window on GLFW_KEY_ESCAPE is pressed.
+// 4. Implement glfw_onFrameBufferSize() function to handel resize window.
+// 5. CleanUp the code by creating the function initOpenGL().
 //-----------------------------------------------------------------------------
-
 #include <iostream> // Deals with input/output
 #define GLEW_STATIC // Important to be static
 #include "GL/glew.h" // include glew before glfw

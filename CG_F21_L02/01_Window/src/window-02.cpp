@@ -1,6 +1,7 @@
 //-----------------------------------------------------------------------------
 // 1. Creates a basic window and OpenGL 3.3 context using GLFW.
-// 2. 
+// 2. Implement printOpenGLInfo() function to print OpenGL Information.
+// 3. Implement an OnCLick listener to close the window on GLFW_KEY_ESCAPE is pressed.
 //-----------------------------------------------------------------------------
 
 #include <iostream> // Deals with input/output
