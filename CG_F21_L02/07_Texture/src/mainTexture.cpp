@@ -100,19 +100,12 @@ int main() {
 	}
 
 	GLenum format = 0;
-	switch (bitdepth)
-	{
-	case 0:
+	if (bitdepth == 0)
 		format = GL_RED;
-	case 3:
+	if (bitdepth == 3)
 		format = GL_RGB;
-	case 4:
+	if (bitdepth == 4)
 		format = GL_RGBA;
-	default:
-		format = 0;
-		cerr << "Error: Unkowen bitdepth!" << endl;
-		break;
-	}
 	
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, texelData);
 	//glGenerateMipmap(GL_TEXTURE_2D);
