@@ -13,9 +13,17 @@ void main()
 {
 	//fragColor = vertColor;
 
-	// having the color from one texture
+
+	// getting the color from one texture
 	//fragColor = texture(texSampler1, TexCoord);
 
-	// having the color from mix of 2 texture
-	fragColor = mix(texture(texSampler1, TexCoord),texture(texSampler2, TexCoord),0.7);
+
+	// Two Options: getting the color from (mix OR overlaying) 2 texture
+	vec4 backgroungTexColor = texture(texSampler1, TexCoord); // the background picture
+	vec4 marioTexColor = texture(texSampler2, TexCoord); //the mario picture
+	// Option 1- Mixing buy using a percentage 
+	//fragColor = mix(backgroungTexColor, marioTexColor, 0.7);
+	// Option 2- Overlaying by using alpha transparency
+	fragColor = mix(backgroungTexColor, marioTexColor, marioTexColor.a);
+
 }

@@ -43,7 +43,7 @@ bool Texture::loadTexture(const string& fileName, bool generateMipMaps)
 	if (nrComponent == 4)
 		format = GL_RGBA;
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, texelData);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, texelData);
 
 	if (generateMipMaps)
 		glGenerateMipmap(GL_TEXTURE_2D);

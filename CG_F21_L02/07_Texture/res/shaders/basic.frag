@@ -8,5 +8,7 @@ uniform sampler2D texSampler1;
 void main() 
 {
 	//fragColor = vertColor;
+
+	// getting color from one texture
 	fragColor = texture(texSampler1, TexCoord);
 }
