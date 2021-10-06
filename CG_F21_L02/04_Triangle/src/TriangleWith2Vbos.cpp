@@ -71,6 +71,9 @@ int main() {
 	// 2. setup buffers on the GPU
 	GLuint vbo, vbo2, vao;
 
+	// first we generate the buffers (GPU memory for the data)
+	// then we bind this buffer (make it active to recive the data and store it)
+	// then we give him the data (vertecies) by using glBufferData()
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // make it as working buffer (Active it)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vert_position), vert_position, GL_STATIC_DRAW); // We used (GL_STATIC_DRAW) cuz our data is fixed
@@ -79,9 +82,15 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo2); // make it as working buffer (Active it)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vert_color), vert_color, GL_STATIC_DRAW); // We used (GL_STATIC_DRAW) cuz our data is fixed
 
+	// after we done eith setting the buffers (VBOs) 
+	// we will do the VAO (that discripes the data we had in the VBOs).
+	// firts we generate VAO ( one VAO can deal -discribe- mant VBOs ).
+	// then bind it (make it active -ready- to take the discription of the data)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao); // make as active one
-
+	
+	// after that we will give bind (active) each VBO and give it to the VAO
+	// and finally we will enable it to the vertex shaders.
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // (Active it) to be used in the next line (for position)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0); // Position
 	glEnableVertexAttribArray(0);
@@ -90,7 +99,11 @@ int main() {
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (GLvoid*)0); // Color
 	glEnableVertexAttribArray(1);
 
-	// Note:
+	// IMPORTANT NOTE: for STRIDE: 
+	// if the vbo has only pos or only color,
+	// so we can make it 0 because its tightly packed
+	// or 3*sizeof(GL_float) . Both are correct!
+	// 
 	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 	//-------------------------------------------------^---this could be also as (sizeof(GLfloat) * 3)
 	//-----------------------------------------------------cuz there is one data only in the array (tightly binded)
