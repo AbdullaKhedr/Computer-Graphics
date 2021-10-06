@@ -25,7 +25,6 @@ const GLchar* fragmentShaderSrc =
 "	fragColor = vec4(0.35f, 0.95f, 0.3f, 1.0);"
 "}";
 
-
 // Functions Prototypes
 bool initOpenGL();
 void print_OpenGL_Info();
