@@ -20,14 +20,10 @@ const int gWindowHeight = 600;
 GLFWwindow* gmainWindow;
 bool gWireframe = false;
 
-const string texture1FileName = "res/images/image1.jpg";
-const string texture2FileName = "res/images/mario.png";
-
-// Translation Related Variables
-bool transDirection = true;
-float offset = 0.0f;
-float maxOffset = 0.7f;
-float increment = 0.01f;
+const string texture1FileName = "res/images/back1.jpg";
+const string texture2FileName = "res/images/front6.png";
+const string texture3FileName = "res/images/back5.jpg";
+const string texture4FileName = "res/images/front3.png";
 
 // Functions Prototypes
 bool initOpenGL();
@@ -46,20 +42,20 @@ int main() {
 
 	GLfloat vertices_square1[] =
 	{
-		// Position				// Color
-	   -0.5f,  0.5f, 0.0f,		0.0f, 1.0f, 0.0f,	// top left
-		0.5f,  0.5f, 0.0f,		0.0f, 0.0f, 1.0f,	// top right 
-		0.5f, -0.5f, 0.0f,		0.0f, 1.0f, 0.0f,	// buttom right
-	   -0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,	// buttom left		
+		 // position			 // texCoords
+		-0.9f,  0.5f, 0.0f,		0.0f, 1.0f,	// top left
+		-0.05f, 0.5f, 0.0f,		1.0f, 1.0f,	// top right 
+		-0.05f,-0.5f, 0.0f,		1.0f, 0.0f,	// buttom right
+		-0.9f, -0.5f, 0.0f,		0.0f, 0.0f	// buttom left	
 	};
 	
 	GLfloat vertices_square2[] =
 	{
-		// Position				// Color
-	   -0.5f,  0.5f, 0.0f,		1.0f, 0.0f, 0.0f,	// top left
-		0.5f,  0.5f, 0.0f,		0.0f, 1.0f, 0.0f,	// top right 
-		0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,	// buttom right
-	   -0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f,	// buttom left		
+		 // position			 // texCoords
+		 0.05f, 0.5f, 0.0f,		0.0f, 1.0f,	// top left
+		 0.9f,  0.5f, 0.0f,		1.0f, 1.0f,	// top right 
+		 0.9f, -0.5f, 0.0f,		1.0f, 0.0f,	// buttom right
+		 0.05f,-0.5f, 0.0f,		0.0f, 0.0f	// buttom left		
 	};
 
 	GLuint indices[] =
@@ -82,11 +78,11 @@ int main() {
 	glBindVertexArray(vao[0]); // make as active one
 
 	// Define positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	// Define color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat)));
+	// Define texture
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
 	glGenBuffers(1, &ibo);
@@ -104,11 +100,11 @@ int main() {
 	glBindVertexArray(vao[1]); // make as active one
 
 	// Define positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	// Define color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat)));
+	// Define texture
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
 	glGenBuffers(1, &ibo);
@@ -123,6 +119,12 @@ int main() {
 
 	Texture texture2;
 	texture2.loadTexture(texture2FileName, true);
+	
+	Texture texture3;
+	texture3.loadTexture(texture3FileName, true);
+
+	Texture texture4;
+	texture4.loadTexture(texture4FileName, true);
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
 	while (!glfwWindowShouldClose(gmainWindow)) {
@@ -137,33 +139,22 @@ int main() {
 
 		texture1.bind(0);
 		texture2.bind(1);
-
+		texture3.bind(2);
+		texture4.bind(3);
+		
+		glBindVertexArray(vao[0]); // ==> Bind vao
 		// Set textures samplers
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
-
-		// Translation Logic
-		if (transDirection)
-			offset += increment;
-		else
-			offset -= increment;
-		if (abs(offset) >= maxOffset)
-			transDirection = !transDirection;
-
-		// Apply any translation on X
-		glUniform2f(glGetUniformLocation(shaderProgram.getProgram(), "transform"), offset, 0);
-		glBindVertexArray(vao[0]); // ==> Bind vao
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind vao
 
-		// Apply any translation on Y
-		glUniform2f(glGetUniformLocation(shaderProgram.getProgram(), "transform"), 0, offset);
 		glBindVertexArray(vao[1]); // ==> Bind vao
+		// Set textures samplers
+		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 2);
+		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 3); 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind vao
-
-		// Add some delay (to have smooth animation)
-		glfwSwapInterval(1);
 
 		//===================================Drawing area===================================//
 
