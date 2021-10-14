@@ -44,40 +44,49 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	GLfloat vertices[] =
+	GLfloat vertices_square1[] =
 	{
-		// position				// texCoords
-	   -0.5f,  0.5f, 0.0f,		0.0f, 1.0f,	// top left
-		0.5f,  0.5f, 0.0f,		1.0f, 1.0f,	// top right 
-		0.5f, -0.5f, 0.0f,		1.0f, 0.0f,	// buttom right
-	   -0.5f, -0.5f, 0.0f,		0.0f, 0.0f	// buttom left		
+		// Position				// Color
+	   -0.5f,  0.5f, 0.0f,		0.0f, 1.0f, 0.0f,	// top left
+		0.5f,  0.5f, 0.0f,		0.0f, 0.0f, 1.0f,	// top right 
+		0.5f, -0.5f, 0.0f,		0.0f, 1.0f, 0.0f,	// buttom right
+	   -0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,	// buttom left		
+	};
+	
+	GLfloat vertices_square2[] =
+	{
+		// Position				// Color
+	   -0.5f,  0.5f, 0.0f,		1.0f, 0.0f, 0.0f,	// top left
+		0.5f,  0.5f, 0.0f,		0.0f, 1.0f, 0.0f,	// top right 
+		0.5f, -0.5f, 0.0f,		0.0f, 0.0f, 1.0f,	// buttom right
+	   -0.5f, -0.5f, 0.0f,		1.0f, 1.0f, 1.0f,	// buttom left		
 	};
 
 	GLuint indices[] =
 	{
-		0,1,2,	// first triangle
-		0,2,3,	// second triangle
+		0, 1, 2,	// first square
+		0, 2, 3,	// second square
 	};
 
 	// Setup buffers on the GPU
-	GLuint vao1, vao2, vbo, ibo;
+	GLuint vao[2], vbo[2], ibo;
 
 	/// <summary>
 	/// Shape 1
 	/// </summary>
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo); // Activate it
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glGenBuffers(1, &vbo[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // Activate it
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_square1), vertices_square1, GL_STATIC_DRAW);
 
-	glGenVertexArrays(1, &vao1);
-	glBindVertexArray(vao1); // make as active one
+	glGenVertexArrays(1, &vao[0]);
+	glBindVertexArray(vao[0]); // make as active one
 
 	// Define positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	// Define texture
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)(3 * sizeof(GLfloat)));
+	// Define color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
 	glGenBuffers(1, &ibo);
@@ -87,15 +96,19 @@ int main() {
 	/// <summary>
 	/// Shape 2
 	/// </summary>
-	glGenVertexArrays(1, &vao2);
-	glBindVertexArray(vao2); // make as active one
+	glGenBuffers(1, &vbo[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // Activate it
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_square2), vertices_square2, GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &vao[1]);
+	glBindVertexArray(vao[1]); // make as active one
 
 	// Define positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	// Define texture
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)(3 * sizeof(GLfloat)));
+	// Define color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
 	glGenBuffers(1, &ibo);
@@ -139,13 +152,13 @@ int main() {
 
 		// Apply any translation on X
 		glUniform2f(glGetUniformLocation(shaderProgram.getProgram(), "transform"), offset, 0);
-		glBindVertexArray(vao1); // ==> Bind vao
+		glBindVertexArray(vao[0]); // ==> Bind vao
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind vao
 
 		// Apply any translation on Y
 		glUniform2f(glGetUniformLocation(shaderProgram.getProgram(), "transform"), 0, offset);
-		glBindVertexArray(vao2); // ==> Bind vao
+		glBindVertexArray(vao[1]); // ==> Bind vao
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind vao
 
@@ -159,9 +172,10 @@ int main() {
 	}
 
 	// Clean up
-	glDeleteVertexArrays(1, &vao1);
-	glDeleteVertexArrays(1, &vao2);
-	glDeleteBuffers(1, &vbo);
+	glDeleteVertexArrays(1, &vao[0]);
+	glDeleteVertexArrays(1, &vao[1]);
+	glDeleteBuffers(1, &vbo[0]);
+	glDeleteBuffers(1, &vbo[1]);
 	glfwTerminate();
 
 	return EXIT_SUCCESS;

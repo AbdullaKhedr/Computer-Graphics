@@ -3,9 +3,9 @@
 //==================//
 #version 330 core
 layout (location = 0) in vec3 pos;
-layout (location = 1) in vec2 texCoord;
+layout (location = 1) in vec3 color;
 
-out vec2 TexCoord;
+out vec3 vertColor;
 
 uniform vec2 transform;
 
@@ -13,6 +13,5 @@ void main()
 {
 	gl_Position = vec4(pos.x + transform.x, pos.y + transform.y, pos.z, 1.0);
 
-	// Out textures with flipping
-	TexCoord = vec2(texCoord.x, 1.0 -texCoord.y);
+	vertColor = color;
 }
