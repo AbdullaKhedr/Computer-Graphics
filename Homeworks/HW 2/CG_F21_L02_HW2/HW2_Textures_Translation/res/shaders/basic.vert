@@ -7,11 +7,11 @@ layout (location = 1) in vec2 texCoord;
 
 out vec2 TexCoord;
 
-uniform mat4 transform;
+uniform vec2 transform;
 
 void main() 
 {
-	gl_Position = transform * vec4(pos.x, pos.y, pos.z, 1.0);
+	gl_Position = vec4(pos.x + transform.x, pos.y + transform.y, pos.z, 1.0);
 
 	// Out textures with flipping
 	TexCoord = vec2(texCoord.x, 1.0 -texCoord.y);

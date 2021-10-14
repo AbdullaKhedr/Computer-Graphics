@@ -44,7 +44,7 @@ int main() {
 		return EXIT_FAILURE;
 	}
 
-	GLfloat vertices[] = 
+	GLfloat vertices[] =
 	{
 		// position				// texCoords
 	   -0.5f,  0.5f, 0.0f,		0.0f, 1.0f,	// top left
@@ -129,8 +129,6 @@ int main() {
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
 
-		glm::mat4 transform = glm::mat4(1.0);
-
 		// Translation Logic
 		if (transDirection)
 			offset += increment;
@@ -139,35 +137,22 @@ int main() {
 		if (abs(offset) >= maxOffset)
 			transDirection = !transDirection;
 
-		// apply any transformation
-		transform = glm::translate(transform, glm::vec3(offset, 0.0f, 0.0f));
-		shaderProgram.setUniform("transform", transform);
-		// Add some delay (to have smooth animation)
-		glfwSwapInterval(1);
-
+		// Apply any translation on X
+		glUniform2f(glGetUniformLocation(shaderProgram.getProgram(), "transform"), offset, 0);
 		glBindVertexArray(vao1); // ==> Bind vao
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind vao
 
-		// Translation Logic
-		if (transDirection)
-			offset += increment;
-		else
-			offset -= increment;
-		if (abs(offset) >= maxOffset)
-			transDirection = !transDirection;
-
-		// apply any transformation
-		transform = glm::translate(transform, glm::vec3(0.0f, offset, 0.0f));
-		shaderProgram.setUniform("transform", transform);
-		// Add some delay (to have smooth animation)
-		glfwSwapInterval(1);
-
+		// Apply any translation on Y
+		glUniform2f(glGetUniformLocation(shaderProgram.getProgram(), "transform"), 0, offset);
 		glBindVertexArray(vao2); // ==> Bind vao
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // ==> Draw
 		glBindVertexArray(0); // ==> Unbind vao
 
-		//=====================Drawing area=====================//
+		// Add some delay (to have smooth animation)
+		glfwSwapInterval(1);
+
+		//===================================Drawing area===================================//
 
 		// Swap the screen buffers (DOUBLE BUFFER CONCEPT)
 		glfwSwapBuffers(gmainWindow);
