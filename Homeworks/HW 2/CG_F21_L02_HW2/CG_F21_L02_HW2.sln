@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HW2_Textures_Translation", "HW2_Textures_Translation\HW2_Textures_Translation.vcxproj", "{056A877B-CFE2-4728-8B96-F9AB17606457}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HW2_Q1_Translations", "HW2_Q1_Translations\HW2_Q1_Translations.vcxproj", "{5724F593-3DDE-421D-99D0-A7B447A25F19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{056A877B-CFE2-4728-8B96-F9AB17606457}.Release|x64.Build.0 = Release|x64
 		{056A877B-CFE2-4728-8B96-F9AB17606457}.Release|x86.ActiveCfg = Release|Win32
 		{056A877B-CFE2-4728-8B96-F9AB17606457}.Release|x86.Build.0 = Release|Win32
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Debug|x64.ActiveCfg = Debug|x64
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Debug|x64.Build.0 = Debug|x64
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Debug|x86.ActiveCfg = Debug|Win32
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Debug|x86.Build.0 = Debug|Win32
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Release|x64.ActiveCfg = Release|x64
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Release|x64.Build.0 = Release|x64
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Release|x86.ActiveCfg = Release|Win32
+		{5724F593-3DDE-421D-99D0-A7B447A25F19}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
