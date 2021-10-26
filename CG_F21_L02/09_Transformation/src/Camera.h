@@ -1,8 +1,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+// Those includes are used and visible also for the calss (Camera.cpp)
 #include "glm/glm.hpp"
 #include"glm/gtc/constants.hpp"
+#include"glm/gtc/matrix_transform.hpp"
 
 class Camera
 {
@@ -10,7 +12,7 @@ public:
 	glm::mat4 getViewMatrix() const;
 
 	virtual void setPosition(const glm::vec3& position) {}
-	virtual void rotate(float yaw, float pitch) {} // not doing rolling!!
+	virtual void rotate(float yaw, float pitch) {} // not doing rolling (on z)!!
 	virtual void move(const glm::vec3& offset) {}
 
 	const glm::vec3& getLook() const;
@@ -50,7 +52,7 @@ public:
 
 	virtual void setPosition(const glm::vec3& position);
 	virtual void rotate(float yaw, float pitch);
-	virtual void move(const glm::vec3& offset);
+	virtual void move(const glm::vec3& offsetPos);
 
 private:
 	void updateCameraVectors();

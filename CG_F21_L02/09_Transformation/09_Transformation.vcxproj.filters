@@ -24,7 +24,7 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mainProjection.cpp">
+    <ClCompile Include="src\mainCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

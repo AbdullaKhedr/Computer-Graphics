@@ -16,10 +16,10 @@
 using namespace std;
 
 // Global Variables
-const char* APP_TITLE = "Computer Graphics - Projection";
+const char* APP_TITLE = "Computer Graphics - Camera";
 int gWindowWidth = 800;
 int gWindowHeight = 600;
-GLFWwindow* gmainWindow;
+GLFWwindow* gMainWindow;
 bool gWireframe = false;
 
 const string texture1FileName = "res/images/image1.jpg";
@@ -40,7 +40,7 @@ float curSize = 0.4f;
 float maxSize = 0.8f;
 float minSize = 0.1f;
 
-// setting fbs camera
+// Setting FBS camera
 FBSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 const double ZOOM_SENSITIVITY = -3.0f;
 const float MOVE_SPEED = 5.0f;
@@ -177,7 +177,7 @@ int main() {
 
 	Texture texture2;
 	texture2.loadTexture(texture2FileName, true);
-	
+
 	Texture floorTexture;
 	floorTexture.loadTexture(texture3FileName, true);
 
@@ -185,13 +185,14 @@ int main() {
 	float cubeAngle = 0.0f;
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
-	while (!glfwWindowShouldClose(gmainWindow))
+	while (!glfwWindowShouldClose(gMainWindow))
 	{
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
+
 		// Get + Handel user input events
 		glfwPollEvents();
-		update(deltaTime);
+		update(deltaTime); // To update everything after each input
 
 		//=====================Drawing area (Bind ==> Draw ==> Unbind) =====================//
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -207,16 +208,15 @@ int main() {
 		// Do some delay (to have sommth animation)
 		glfwSwapInterval(1);
 
-		glm::mat4 transform = glm::mat4(1.0);
+		// Model, View, and Projection
+		glm::mat4 model(1.0);
+		glm::mat4 view(1.0);
+		glm::mat4 projection(1.0);
 
-		// model, view, and projection
-		glm::mat4 model = glm::mat4(1.0);
-		glm::mat4 view(1.0), projection(1.0);
-
-
+		// Create the View matrix
 		view = fpsCamera.getViewMatrix();
 
-		// create the projection matrix
+		// Create the Projection matrix
 		projection = glm::perspective(glm::radians(fpsCamera.getFOV()), (float)gWindowHeight / (float)gWindowWidth, 0.1f, 100.0f);
 
 		shaderProgram.setUniform("model", model);
@@ -226,16 +226,21 @@ int main() {
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0); // ==> unbind vao
-		//=====================Drawing area=====================//
 
+		// Draw the floor
 		floorTexture.bind(0);
 		model = glm::translate(model, floorPos) * glm::scale(model, glm::vec3(10.0f, 0.01f, 10.0f));
 		shaderProgram.setUniform("model", model);
+		glBindVertexArray(vao);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0); // ==> unbind vao
+
+		//=====================Drawing area=====================//
 
 		lastTime = currentTime;
 
 		// Swap the screen buffers (DOUBLE BUFFER CONCEPT)
-		glfwSwapBuffers(gmainWindow);
+		glfwSwapBuffers(gMainWindow);
 	}
 
 	// Clean up
@@ -265,8 +270,8 @@ bool initOpenGL() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Creat the main window
-	gmainWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
-	if (gmainWindow == NULL)
+	gMainWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
+	if (gMainWindow == NULL)
 	{
 		cout << "Failed to create GLFW window!" << endl;
 		glfwTerminate();
@@ -274,7 +279,7 @@ bool initOpenGL() {
 	}
 
 	// Set context for GLEW to use
-	glfwMakeContextCurrent(gmainWindow);
+	glfwMakeContextCurrent(gMainWindow);
 
 	// Initialize GLEW
 	//glewExperimental = GL_TRUE;
@@ -285,13 +290,13 @@ bool initOpenGL() {
 	}
 
 	// Set callbacks functions
-	glfwSetKeyCallback(gmainWindow, glfwOnKey);
-	glfwSetFramebufferSizeCallback(gmainWindow, glfw_onFrameBufferSize);
-	glfwSetScrollCallback(gmainWindow, glfw_onMouseScroll);
+	glfwSetKeyCallback(gMainWindow, glfwOnKey);
+	glfwSetFramebufferSizeCallback(gMainWindow, glfw_onFrameBufferSize);
+	glfwSetScrollCallback(gMainWindow, glfw_onMouseScroll);
 
 	// set the mouse to center and hide the cursor
-	glfwSetInputMode(gmainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPos(gmainWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
+	glfwSetInputMode(gMainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPos(gMainWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
 
 
 	// Clear the colorbuffer
@@ -318,7 +323,7 @@ void glfwOnKey(GLFWwindow* window, int key, int scancode, int action, int mode) 
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
-	if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
 		gWireframe = !gWireframe; //toggele it
 
 		if (gWireframe)
@@ -348,31 +353,32 @@ void glfw_onMouseScroll(GLFWwindow* window, double deltaX, double deltaY)
 void update(double elapsedTime)
 {
 	double mouseX, mouseY;
-	glfwGetCursorPos(gmainWindow, &mouseX, &mouseY);
+	glfwGetCursorPos(gMainWindow, &mouseX, &mouseY);
 
 	// Rotate the camer
-	fpsCamera.rotate((float)(gWindowWidth / 2.0 - mouseX) * MOUSE_SENSITIVITY, (float)(gWindowHeight / 2.0 - mouseY) * MOUSE_SENSITIVITY);
+	fpsCamera.rotate((float)(gWindowWidth / 2.0 - mouseX) * MOUSE_SENSITIVITY,
+		(float)(gWindowHeight / 2.0 - mouseY) * MOUSE_SENSITIVITY);
 
-	glfwSetCursorPos(gmainWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
+	glfwSetCursorPos(gMainWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
 
 	// Handel camera movement based on WASD keys
 	// forward & backward
-	if (glfwGetKey(gmainWindow, GLFW_KEY_W) == GLFW_PRESS)
-		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getLook());
-	if (glfwGetKey(gmainWindow, GLFW_KEY_S) == GLFW_PRESS)
-		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getLook());
+	if (glfwGetKey(gMainWindow, GLFW_KEY_W) == GLFW_PRESS)
+		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getLook());
+	if (glfwGetKey(gMainWindow, GLFW_KEY_S) == GLFW_PRESS)
+		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getLook());
 
 	// left & right
-	if (glfwGetKey(gmainWindow, GLFW_KEY_A) == GLFW_PRESS)
-		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getRight());
-	if (glfwGetKey(gmainWindow, GLFW_KEY_D) == GLFW_PRESS)
-		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getRight());
+	if (glfwGetKey(gMainWindow, GLFW_KEY_A) == GLFW_PRESS)
+		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getRight());
+	if (glfwGetKey(gMainWindow, GLFW_KEY_D) == GLFW_PRESS)
+		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getRight());
 
 	// up & down
-	if (glfwGetKey(gmainWindow, GLFW_KEY_Z) == GLFW_PRESS)
-		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getUp());
-	if (glfwGetKey(gmainWindow, GLFW_KEY_X) == GLFW_PRESS)
-		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getUp());
+	if (glfwGetKey(gMainWindow, GLFW_KEY_Z) == GLFW_PRESS)
+		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getUp());
+	if (glfwGetKey(gMainWindow, GLFW_KEY_X) == GLFW_PRESS)
+		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getUp());
 
 }
 

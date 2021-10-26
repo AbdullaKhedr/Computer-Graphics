@@ -17,5 +17,5 @@ void main()
 	TexCoord = texCoord;
 
 	// method 1 to flip texture
-	TexCoord = vec2(texCoord.x, 1.0 -texCoord.y);
+	//TexCoord = vec2(texCoord.x, 1.0 -texCoord.y);
 }

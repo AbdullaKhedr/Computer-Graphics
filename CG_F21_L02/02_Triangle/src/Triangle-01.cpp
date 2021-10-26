@@ -9,7 +9,7 @@ using namespace std;
 const char* APP_TITLE = "Computer Graphics - Hello Triangle";
 const int gWindowWidth = 800;
 const int gWindowHeight = 600;
-GLFWwindow* gmainWindow;
+GLFWwindow* gMainWindow;
 // 3.1 Get the shader (usully from file), but for now it's just an array of chars
 const GLchar* vertexShaderSrc =
 "#version 330 core\n"
@@ -108,7 +108,7 @@ int main() {
 	glDeleteShader(fs);
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
-	while (!glfwWindowShouldClose(gmainWindow)) {
+	while (!glfwWindowShouldClose(gMainWindow)) {
 		// Get + Handel user input events
 		glfwPollEvents();
 
@@ -122,7 +122,7 @@ int main() {
 		//=====================Drawing area=====================//
 
 		// Swap the screen buffers (DOUBLE BUFFER CONCEPT)
-		glfwSwapBuffers(gmainWindow);
+		glfwSwapBuffers(gMainWindow);
 	}
 
 	// Clean up
@@ -152,8 +152,8 @@ bool initOpenGL() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// Creat the main window
-	gmainWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
-	if (gmainWindow == NULL)
+	gMainWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
+	if (gMainWindow == NULL)
 	{
 		cout << "Failed to create GLFW window!" << endl;
 		glfwTerminate();
@@ -161,7 +161,7 @@ bool initOpenGL() {
 	}
 
 	// Set context for GLEW to use
-	glfwMakeContextCurrent(gmainWindow);
+	glfwMakeContextCurrent(gMainWindow);
 
 	// Initialize GLEW
 	//glewExperimental = GL_TRUE;
@@ -172,8 +172,8 @@ bool initOpenGL() {
 	}
 
 	// Set callbacks functions
-	glfwSetKeyCallback(gmainWindow, glfwOnKey);
-	glfwSetFramebufferSizeCallback(gmainWindow, glfw_onFrameBufferSize);
+	glfwSetKeyCallback(gMainWindow, glfwOnKey);
+	glfwSetFramebufferSizeCallback(gMainWindow, glfw_onFrameBufferSize);
 
 	// Clear the colorbuffer
 	glClearColor(0.2f, 0.4f, 0.6f, 1.0f);

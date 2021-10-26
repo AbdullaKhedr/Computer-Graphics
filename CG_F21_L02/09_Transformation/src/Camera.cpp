@@ -1,18 +1,14 @@
 #include "Camera.h"
 
-#include"glm/gtc/matrix_transform.hpp"
-
-const float FOV = 45.0f;
-
 Camera::Camera()
 	:mPosition(glm::vec3(0.0f, 0.0f, 0.0f)),
 	mTargetPos(glm::vec3(0.0f, 0.0f, 0.0f)),
-	mUp(glm::vec3(0.0f, 0.0f, 0.0f)),
+	mUp(glm::vec3(0.0f, 1.0f, 0.0f)),
 	mRight(glm::vec3(0.0f, 0.0f, 0.0f)),
-	worldUp(glm::vec3(0.0f, 0.0f, 0.0f)),
+	worldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
 	mYaw(glm::pi<float>()),
 	mPitch(0.0f),
-	mFOV(FOV)
+	mFOV(45.0f)
 {}
 
 glm::mat4 Camera::getViewMatrix() const
@@ -39,6 +35,7 @@ FBSCamera::FBSCamera(glm::vec3 position, float yaw, float pitch)
 	mYaw = yaw;
 	mPitch = pitch;
 }
+
 FBSCamera::FBSCamera(glm::vec3 position, glm::vec3 target)
 {
 	mPosition = position;
@@ -54,6 +51,7 @@ void FBSCamera::setPosition(const glm::vec3& position)
 {
 	mPosition = position;
 }
+
 void FBSCamera::rotate(float yaw, float pitch)
 {
 	mYaw += glm::radians(yaw);
@@ -61,17 +59,19 @@ void FBSCamera::rotate(float yaw, float pitch)
 
 	// add constrains on the values to be on the range
 	mPitch = glm::clamp(mPitch, -glm::pi<float>() / 2.0f + 0.1f, glm::pi<float>() / 2.0f - 0.1f);
+	
+	// Constraints to keep on rangr 0 to 2PI
 	if (mYaw > glm::two_pi<float>())
 		mYaw -= glm::two_pi<float>();
-	if (mYaw < 0.0f)
+	if (mYaw < 0.0)
 		mYaw += glm::two_pi<float>();
 
 	updateCameraVectors();
-
 }
-void FBSCamera::move(const glm::vec3& offset)
+
+void FBSCamera::move(const glm::vec3& offsetPos)
 {
-	mPosition += offset;
+	mPosition += offsetPos;
 	updateCameraVectors();
 }
 
