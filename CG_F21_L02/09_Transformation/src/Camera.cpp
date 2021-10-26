@@ -11,6 +11,7 @@ Camera::Camera()
 	mRight(glm::vec3(0.0f, 0.0f, 0.0f)),
 	worldUp(glm::vec3(0.0f, 0.0f, 0.0f)),
 	mYaw(glm::pi<float>()),
+	mPitch(0.0f),
 	mFOV(FOV)
 {}
 
@@ -32,7 +33,7 @@ const glm::vec3& Camera::getUp() const
 	return mUp;
 }
 
-FBSCamera::FBSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float yaw = glm::pi<float>(), float pitch = 0.0f)
+FBSCamera::FBSCamera(glm::vec3 position, float yaw, float pitch)
 {
 	mPosition = position;
 	mYaw = yaw;
@@ -62,11 +63,30 @@ void FBSCamera::rotate(float yaw, float pitch)
 	mPitch = glm::clamp(mPitch, -glm::pi<float>() / 2.0f + 0.1f, glm::pi<float>() / 2.0f - 0.1f);
 	if (mYaw > glm::two_pi<float>())
 		mYaw -= glm::two_pi<float>();
-	if (mYaw < 0.0)
+	if (mYaw < 0.0f)
 		mYaw += glm::two_pi<float>();
+
+	updateCameraVectors();
 
 }
 void FBSCamera::move(const glm::vec3& offset)
 {
-
+	mPosition += offset;
+	updateCameraVectors();
 }
+
+void FBSCamera::updateCameraVectors() 
+{
+	glm::vec3 look;
+	look.x = cosf(mPitch) * sinf(mYaw);
+	look.y = sinf(mPitch);
+	look.z = cosf(mPitch) * cosf(mYaw);
+
+	mLook = glm::normalize(look);
+
+	mRight = glm::normalize(glm::cross(mLook, worldUp));
+	mUp = glm::normalize(glm::cross(mLook, mRight));
+
+	mTargetPos = mPosition + mLook;
+}
+

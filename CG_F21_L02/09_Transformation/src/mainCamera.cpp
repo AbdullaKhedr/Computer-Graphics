@@ -11,6 +11,7 @@
 // 09_Transformation
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "Camera.h"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ bool gWireframe = false;
 
 const string texture1FileName = "res/images/image1.jpg";
 const string texture2FileName = "res/images/mario.png";
+const string texture3FileName = "res/images/TexturesCom_WoodPanelOrnate02_header.jpg";
 
 // 09_Transformation
 // experiment with translation
@@ -38,12 +40,19 @@ float curSize = 0.4f;
 float maxSize = 0.8f;
 float minSize = 0.1f;
 
+// setting fbs camera
+FBSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+const double ZOOM_SENSITIVITY = -3.0f;
+const float MOVE_SPEED = 5.0f;
+const float MOUSE_SENSITIVITY = 0.1f;
 
 // Functions Prototypes
 bool initOpenGL();
 void print_OpenGL_Info();
 void glfwOnKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void glfw_onFrameBufferSize(GLFWwindow* window, int width, int height);
+void glfw_onMouseScroll(GLFWwindow* window, double deltaX, double deltaY);
+void update(double elapsedTime);
 
 //-----------------------------------------------------------------------------
 // Main Application Entry Point
@@ -139,10 +148,11 @@ int main() {
 
 	};
 
-	glm::vec3 cubePos(0.0f, 0.0f, -5.0f);
+	glm::vec3 cubePos(0.0f, 0.0f, 0.0f);
+	glm::vec3 floorPos(0.0f, -1.0f, 0.0f);
 
 	// setup buffers on the GPU
-	GLuint vbo, vao, ibo; // ibo -> index / element buffer object
+	GLuint vbo, vao; // ibo -> index / element buffer object
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // make it as working buffer (Active it)
@@ -167,6 +177,9 @@ int main() {
 
 	Texture texture2;
 	texture2.loadTexture(texture2FileName, true);
+	
+	Texture floorTexture;
+	floorTexture.loadTexture(texture3FileName, true);
 
 	double lastTime = glfwGetTime();
 	float cubeAngle = 0.0f;
@@ -178,11 +191,10 @@ int main() {
 		double deltaTime = currentTime - lastTime;
 		// Get + Handel user input events
 		glfwPollEvents();
+		update(deltaTime);
 
 		//=====================Drawing area (Bind ==> Draw ==> Unbind) =====================//
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		shaderProgram.use();
 
 		texture1.bind(0);
 		texture2.bind(1);
@@ -190,39 +202,35 @@ int main() {
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
 
+		shaderProgram.use();
+
+		// Do some delay (to have sommth animation)
+		glfwSwapInterval(1);
+
 		glm::mat4 transform = glm::mat4(1.0);
 
 		// model, view, and projection
 		glm::mat4 model = glm::mat4(1.0);
 		glm::mat4 view(1.0), projection(1.0);
 
-		glm::vec3 camPos(0.0f, 0.0f, 0.0f);
-		glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
-		glm::vec3 up(0.0f, 1.0f, 0.0f);
 
+		view = fpsCamera.getViewMatrix();
 
-		cubeAngle += (float)(deltaTime * 50.0f);
-		if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
-
-		// create the model matrix
-		model = glm::translate(model, cubePos) * glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-		// create the view matrix
-		view = glm::lookAt(camPos, camPos + targetPos, up);
 		// create the projection matrix
-		projection = glm::perspective(glm::radians(45.0f), (float)gWindowHeight / (float)gWindowWidth, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(fpsCamera.getFOV()), (float)gWindowHeight / (float)gWindowWidth, 0.1f, 100.0f);
 
 		shaderProgram.setUniform("model", model);
 		shaderProgram.setUniform("view", view);
 		shaderProgram.setUniform("projection", projection);
 
-		// Do some delay (to have sommth animation)
-		glfwSwapInterval(1);
-
 		glBindVertexArray(vao);
-		// 09_ updates this to DrawArray()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0); // ==> unbind vao
 		//=====================Drawing area=====================//
+
+		floorTexture.bind(0);
+		model = glm::translate(model, floorPos) * glm::scale(model, glm::vec3(10.0f, 0.01f, 10.0f));
+		shaderProgram.setUniform("model", model);
 
 		lastTime = currentTime;
 
@@ -279,6 +287,12 @@ bool initOpenGL() {
 	// Set callbacks functions
 	glfwSetKeyCallback(gmainWindow, glfwOnKey);
 	glfwSetFramebufferSizeCallback(gmainWindow, glfw_onFrameBufferSize);
+	glfwSetScrollCallback(gmainWindow, glfw_onMouseScroll);
+
+	// set the mouse to center and hide the cursor
+	glfwSetInputMode(gmainWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPos(gmainWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
+
 
 	// Clear the colorbuffer
 	glClearColor(0.2f, 0.4f, 0.6f, 1.0f);
@@ -322,6 +336,45 @@ void glfw_onFrameBufferSize(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+// Handel mouse scrolling
+void glfw_onMouseScroll(GLFWwindow* window, double deltaX, double deltaY)
+{
+	double fov = fpsCamera.getFOV() + deltaY * ZOOM_SENSITIVITY;
+	fov = glm::clamp(fov, 1.0, 120.0);
+	fpsCamera.setFOV((float)fov);
+}
+
+// Update the camera every frame
+void update(double elapsedTime)
+{
+	double mouseX, mouseY;
+	glfwGetCursorPos(gmainWindow, &mouseX, &mouseY);
+
+	// Rotate the camer
+	fpsCamera.rotate((float)(gWindowWidth / 2.0 - mouseX) * MOUSE_SENSITIVITY, (float)(gWindowHeight / 2.0 - mouseY) * MOUSE_SENSITIVITY);
+
+	glfwSetCursorPos(gmainWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
+
+	// Handel camera movement based on WASD keys
+	// forward & backward
+	if (glfwGetKey(gmainWindow, GLFW_KEY_W) == GLFW_PRESS)
+		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getLook());
+	if (glfwGetKey(gmainWindow, GLFW_KEY_S) == GLFW_PRESS)
+		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getLook());
+
+	// left & right
+	if (glfwGetKey(gmainWindow, GLFW_KEY_A) == GLFW_PRESS)
+		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getRight());
+	if (glfwGetKey(gmainWindow, GLFW_KEY_D) == GLFW_PRESS)
+		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getRight());
+
+	// up & down
+	if (glfwGetKey(gmainWindow, GLFW_KEY_Z) == GLFW_PRESS)
+		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getUp());
+	if (glfwGetKey(gmainWindow, GLFW_KEY_X) == GLFW_PRESS)
+		fpsCamera, move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getUp());
+
+}
 
 // Print OpenGL version information
 void print_OpenGL_Info() {

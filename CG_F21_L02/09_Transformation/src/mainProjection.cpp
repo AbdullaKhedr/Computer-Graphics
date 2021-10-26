@@ -172,7 +172,7 @@ int main() {
 	float cubeAngle = 0.0f;
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
-	while (!glfwWindowShouldClose(gmainWindow)) 
+	while (!glfwWindowShouldClose(gmainWindow))
 	{
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
@@ -182,44 +182,43 @@ int main() {
 		//=====================Drawing area (Bind ==> Draw ==> Unbind) =====================//
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shaderProgram.use();
-
 		texture1.bind(0);
 		texture2.bind(1);
 		// if more than 1 texture we need this (like this case)
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler1"), 0);
 		glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "texSampler2"), 1);
 
-		glm::mat4 transform = glm::mat4(1.0);
+		shaderProgram.use();
 
-		// model, view, and projection
-		glm::mat4 model = glm::mat4(1.0);
-		glm::mat4 view(1.0), projection(1.0);
+		// Do some delay (to have sommth animation)
+		glfwSwapInterval(1);
 
+		// Model, View, and Projection
+		glm::mat4 model(1.0);
+		glm::mat4 view(1.0);
+		glm::mat4 projection(1.0);
+
+		// Create the Model matrix
+		cubeAngle += (float)(deltaTime * 50.0f);
+		if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
+
+		model = glm::translate(model, cubePos) * glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+		// Create the View matrix
 		glm::vec3 camPos(0.0f, 0.0f, 0.0f);
 		glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
 		glm::vec3 up(0.0f, 1.0f, 0.0f);
 
-		
-		cubeAngle += (float) (deltaTime * 50.0f);
-		if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
-		
-		// create the model matrix
-		model = glm::translate(model, cubePos) * glm::rotate(model,glm::radians(cubeAngle),glm::vec3(0.0f,1.0f,0.0f));
-		// create the view matrix
 		view = glm::lookAt(camPos, camPos + targetPos, up);
-		// create the projection matrix
+
+		// Create the Projection matrix
 		projection = glm::perspective(glm::radians(45.0f), (float)gWindowHeight / (float)gWindowWidth, 0.1f, 100.0f);
 
 		shaderProgram.setUniform("model", model);
 		shaderProgram.setUniform("view", view);
 		shaderProgram.setUniform("projection", projection);
 
-		// Do some delay (to have sommth animation)
-		glfwSwapInterval(1);
-
 		glBindVertexArray(vao);
-		// 09_ updates this to DrawArray()
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0); // ==> unbind vao
 		//=====================Drawing area=====================//

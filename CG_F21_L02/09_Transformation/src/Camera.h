@@ -9,9 +9,9 @@ class Camera
 public:
 	glm::mat4 getViewMatrix() const;
 
-	virtual void setPosition(const glm::vec3& position);
-	virtual void rotate(float yaw, float pitch); // not doing rolling!!
-	virtual void move(const glm::vec3& offset);
+	virtual void setPosition(const glm::vec3& position) {}
+	virtual void rotate(float yaw, float pitch) {} // not doing rolling!!
+	virtual void move(const glm::vec3& offset) {}
 
 	const glm::vec3& getLook() const;
 	const glm::vec3& getRight() const;
@@ -24,7 +24,7 @@ protected:
 
 	Camera();
 
-	virtual void updateCameraVectors();
+	virtual void updateCameraVectors() {}
 
 	glm::vec3 mPosition;
 	glm::vec3 mTargetPos;
@@ -45,7 +45,7 @@ protected:
 class FBSCamera : public Camera
 {
 public:
-	FBSCamera(glm::vec3 position, float yaw, float pitch);
+	FBSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float yaw = glm::pi<float>(), float pitch = 0.0f);
 	FBSCamera(glm::vec3 position, glm::vec3 target);
 
 	virtual void setPosition(const glm::vec3& position);
