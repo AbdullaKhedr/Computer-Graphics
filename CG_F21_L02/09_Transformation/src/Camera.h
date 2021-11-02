@@ -44,11 +44,11 @@ protected:
 
 // implementation of FPS Camera
 
-class FBSCamera : public Camera
+class FPSCamera : public Camera
 {
 public:
-	FBSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float yaw = glm::pi<float>(), float pitch = 0.0f);
-	FBSCamera(glm::vec3 position, glm::vec3 target);
+	FPSCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float yaw = glm::pi<float>(), float pitch = 0.0f);
+	FPSCamera(glm::vec3 position, glm::vec3 target);
 
 	virtual void setPosition(const glm::vec3& position);
 	virtual void rotate(float yaw, float pitch);
@@ -60,6 +60,3 @@ private:
 };
 
 #endif
-
-
-

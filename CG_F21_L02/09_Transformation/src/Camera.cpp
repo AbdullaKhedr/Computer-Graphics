@@ -29,14 +29,14 @@ const glm::vec3& Camera::getUp() const
 	return mUp;
 }
 
-FBSCamera::FBSCamera(glm::vec3 position, float yaw, float pitch)
+FPSCamera::FPSCamera(glm::vec3 position, float yaw, float pitch)
 {
 	mPosition = position;
 	mYaw = yaw;
 	mPitch = pitch;
 }
 
-FBSCamera::FBSCamera(glm::vec3 position, glm::vec3 target)
+FPSCamera::FPSCamera(glm::vec3 position, glm::vec3 target)
 {
 	mPosition = position;
 	mTargetPos = target;
@@ -47,12 +47,12 @@ FBSCamera::FBSCamera(glm::vec3 position, glm::vec3 target)
 	mPitch = -atan2(lookDir.y, sqrt(pow(lookDir.x, 2) + pow(lookDir.z, 2)));
 }
 
-void FBSCamera::setPosition(const glm::vec3& position)
+void FPSCamera::setPosition(const glm::vec3& position)
 {
 	mPosition = position;
 }
 
-void FBSCamera::rotate(float yaw, float pitch)
+void FPSCamera::rotate(float yaw, float pitch)
 {
 	mYaw += glm::radians(yaw);
 	mPitch += glm::radians(pitch);
@@ -69,13 +69,13 @@ void FBSCamera::rotate(float yaw, float pitch)
 	updateCameraVectors();
 }
 
-void FBSCamera::move(const glm::vec3& offsetPos)
+void FPSCamera::move(const glm::vec3& offsetPos)
 {
 	mPosition += offsetPos;
 	updateCameraVectors();
 }
 
-void FBSCamera::updateCameraVectors() 
+void FPSCamera::updateCameraVectors() 
 {
 	glm::vec3 look;
 	look.x = cosf(mPitch) * sinf(mYaw);
@@ -85,8 +85,7 @@ void FBSCamera::updateCameraVectors()
 	mLook = glm::normalize(look);
 
 	mRight = glm::normalize(glm::cross(mLook, worldUp));
-	mUp = glm::normalize(glm::cross(mLook, mRight));
+	mUp = glm::normalize(glm::cross(mRight, mLook)); // Right should comes first, then the Look
 
 	mTargetPos = mPosition + mLook;
 }
-

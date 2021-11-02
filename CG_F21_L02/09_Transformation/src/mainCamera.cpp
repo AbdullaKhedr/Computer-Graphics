@@ -17,8 +17,8 @@ using namespace std;
 
 // Global Variables
 const char* APP_TITLE = "Computer Graphics - Camera";
-int gWindowWidth = 800;
-int gWindowHeight = 600;
+int gWindowWidth = 1000;
+int gWindowHeight = 1000;
 GLFWwindow* gMainWindow;
 bool gWireframe = false;
 
@@ -41,7 +41,7 @@ float maxSize = 0.8f;
 float minSize = 0.1f;
 
 // Setting FBS camera
-FBSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 const double ZOOM_SENSITIVITY = -3.0f;
 const float MOVE_SPEED = 5.0f;
 const float MOUSE_SENSITIVITY = 0.1f;
@@ -370,9 +370,9 @@ void update(double elapsedTime)
 
 	// left & right
 	if (glfwGetKey(gMainWindow, GLFW_KEY_A) == GLFW_PRESS)
-		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getRight());
-	if (glfwGetKey(gMainWindow, GLFW_KEY_D) == GLFW_PRESS)
 		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getRight());
+	if (glfwGetKey(gMainWindow, GLFW_KEY_D) == GLFW_PRESS)
+		fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getRight());
 
 	// up & down
 	if (glfwGetKey(gMainWindow, GLFW_KEY_Z) == GLFW_PRESS)
