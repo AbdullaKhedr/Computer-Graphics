@@ -22,19 +22,6 @@ int gWindowWidth = 800;
 int gWindowHeight = 600;
 GLFWwindow* gmainWindow;
 bool gWireframe = false;
-// 09_Transformation
-// experiment with translation
-bool transDirection = true;
-float offset = 0.0f;
-float maxOffset = 0.7f;
-float increment = 0.01f;
-// experiment with rotation
-float curAngle = 0.0f;
-// experiment with scaling
-bool sizeDirection = true;
-float curSize = 0.4f;
-float maxSize = 0.8f;
-float minSize = 0.1f;
 
 // Functions Prototypes
 bool initOpenGL();
@@ -136,46 +123,19 @@ int main() {
 
 	};
 
-	glm::vec3 cubesPositions[] = {
-		// Line 1
-		glm::vec3(-3.5f, 5.0f, -20.0f),
-		glm::vec3(-1.167f, 5.0f, -20.0f),
-		glm::vec3(1.167f, 5.0f, -20.0f),
-		glm::vec3(3.5f, 5.0f, -20.0f),
-
-		// Line 2
-		glm::vec3(-3.5f, 2.5f, -20.0f),
-		glm::vec3(-1.167f, 2.5f, -20.0f),
-		glm::vec3(1.167f, 2.5f, -20.0f),
-		glm::vec3(3.5f, 2.5f, -20.0f),
-
-		// Line 3
-		glm::vec3(-3.5f,   0.0f, -20.0f),
-		glm::vec3(-1.167f, 0.0f, -20.0f),
-		glm::vec3(1.167f, 0.0f, -20.0f),
-		glm::vec3(3.5f,   0.0f, -20.0f),
-
-		// Line 4
-		glm::vec3(-3.5f,   -2.5f, -20.0f),
-		glm::vec3(-1.167f, -2.5f, -20.0f),
-		glm::vec3(1.167f, -2.5f, -20.0f),
-		glm::vec3(3.5f,   -2.5f, -20.0f),
-
-		// Line 5
-		glm::vec3(-3.5f,   -5.0f, -20.0f),
-		glm::vec3(-1.167f, -5.0f, -20.0f),
-		glm::vec3(1.167f, -5.0f, -20.0f),
-		glm::vec3(3.5f,   -5.0f, -20.0f),
-	};
+	// Number of cubes we draw
+	const int rows = 5, cols = 4;
+	const int total = rows * cols;
 
 	// setup buffers on the GPU
-	GLuint vbo, vao[20];
+	GLuint vbo, vao[total];
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // make it as working buffer (Active it)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // We used (GL_STATIC_DRAW) cuz our data is fixed
 
-	for (int i = 0; i < 20; i++)
+	// Creat a VAO for each cube to be drawen.
+	for (int i = 0; i < total; i++)
 	{
 		glGenVertexArrays(1, &vao[i]);
 		glBindVertexArray(vao[i]); // make as active one
@@ -192,14 +152,10 @@ int main() {
 	ShaderProgram shaderProgram;
 	shaderProgram.loadShaders("res/shaders/transform.vert", "res/shaders/transform.frag");
 
-	double lastTime = glfwGetTime();
-	float cubeAngle = 0.0f;
+	float curAngle = 0.0f;
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
 	while (!glfwWindowShouldClose(gmainWindow)) {
-
-		double currentTime = glfwGetTime();
-		double deltaTime = currentTime - lastTime;
 		// Get + Handel user input events
 		glfwPollEvents();
 
@@ -211,40 +167,42 @@ int main() {
 		// Do some delay (to have smooth animation)
 		glfwSwapInterval(1);
 
-		for (int i = 0; i < 20; i++)
+		float translateYOffset = 0.6f;
+		float c = 100.0f;
+		for (int i = 0; i < rows; i++)
 		{
-			// Model, View, and Projection
-			glm::mat4 model(1.0);
-			glm::mat4 view(1.0);
-			glm::mat4 projection(1.0);
+			float scaleFactor = 0.035f;
+			float translateXOffset = -0.55f;
 
-			// Create the Model matrix
-			cubeAngle += (float)(deltaTime * 50.0f);
-			if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
+			for (int i = 0; i < cols; i++)
+			{
+				// Transform matrix
+				glm::mat4 transform = glm::mat4(1.0);
 
-			model = glm::translate(model, cubesPositions[i]) * glm::rotate(model, glm::radians(cubeAngle), glm::vec3(1.0f, 1.0f, 0.0f));
+				// Rotation
+				curAngle += 0.1f;
 
-			// Create the View matrix
-			glm::vec3 camPos(0.0f, 0.0f, 0.0f);
-			glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
-			glm::vec3 up(0.0f, 1.0f, 0.0f);
+				// apply any transformation
+				transform = glm::translate(transform, glm::vec3(translateXOffset, translateYOffset, 0.0f));
+				transform = glm::rotate(transform, glm::radians(curAngle + c), glm::vec3(1.0f, 1.0f, 0.0f));
+				transform = glm::scale(transform, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
 
-			view = glm::lookAt(camPos, camPos + targetPos, up);
+				shaderProgram.setUniform("transform", transform);
 
-			// Create the Projection matrix
-			projection = glm::perspective(glm::radians(45.0f), (float)gWindowHeight / (float)gWindowWidth, 0.1f, 100.0f);
+				// Drawing
+				glBindVertexArray(vao[i]); // Bind
+				glDrawArrays(GL_TRIANGLES, 0, 36); // Draw
+				glBindVertexArray(0); // Unbind
 
-			shaderProgram.setUniform("model", model);
-			shaderProgram.setUniform("view", view);
-			shaderProgram.setUniform("projection", projection);
-
-			// Drawing
-			glBindVertexArray(vao[i]); // Bind
-			glDrawArrays(GL_TRIANGLES, 0, 36); // Draw
-			glBindVertexArray(0); // Unbind
+				// Scal 30% each time
+				scaleFactor += scaleFactor * 0.3f;
+				// translate to the right
+				translateXOffset += (7.0f / 20.0f);
+				// To simulate color propagation
+				c = c - 10;
+			}
+			translateYOffset -= (7.0f / 25.0f);
 		}
-
-		lastTime = currentTime;
 
 		//=====================Drawing area=====================//
 
