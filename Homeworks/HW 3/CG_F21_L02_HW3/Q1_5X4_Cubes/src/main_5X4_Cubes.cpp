@@ -138,53 +138,56 @@ int main() {
 
 	glm::vec3 cubesPositions[] = {
 		// Line 1
-		glm::vec3(-0.750f, 0.750f, -20.0f),
-		glm::vec3(-0.375f, 0.750f, -20.0f),
-		glm::vec3(0.375f, 0.750f, -20.0f),
-		glm::vec3(0.750f, 0.750f, -20.0f),
+		glm::vec3(-3.5f, 5.0f, -20.0f),
+		glm::vec3(-1.167f, 5.0f, -20.0f),
+		glm::vec3(1.167f, 5.0f, -20.0f),
+		glm::vec3(3.5f, 5.0f, -20.0f),
 
 		// Line 2
-		glm::vec3(-0.750f, 0.375f, -20.0f),
-		glm::vec3(-0.375f, 0.375f, -20.0f),
-		glm::vec3(0.375f, 0.375f, -20.0f),
-		glm::vec3(0.750f, 0.375f, -20.0f),
+		glm::vec3(-3.5f, 2.5f, -20.0f),
+		glm::vec3(-1.167f, 2.5f, -20.0f),
+		glm::vec3(1.167f, 2.5f, -20.0f),
+		glm::vec3(3.5f, 2.5f, -20.0f),
 
 		// Line 3
-		glm::vec3(-0.750f, 0.0f, -20.0f),
-		glm::vec3(-0.375f, 0.0f, -20.0f),
-		glm::vec3(0.375f, 0.0f, -20.0f),
-		glm::vec3(0.750f, 0.0f, -20.0f),
+		glm::vec3(-3.5f,   0.0f, -20.0f),
+		glm::vec3(-1.167f, 0.0f, -20.0f),
+		glm::vec3(1.167f, 0.0f, -20.0f),
+		glm::vec3(3.5f,   0.0f, -20.0f),
 
 		// Line 4
-		glm::vec3(-0.750f, -0.375f, -20.0f),
-		glm::vec3(-0.375f, -0.375f, -20.0f),
-		glm::vec3(0.375f, -0.375f, -20.0f),
-		glm::vec3(0.750f, -0.375f, -20.0f),
+		glm::vec3(-3.5f,   -2.5f, -20.0f),
+		glm::vec3(-1.167f, -2.5f, -20.0f),
+		glm::vec3(1.167f, -2.5f, -20.0f),
+		glm::vec3(3.5f,   -2.5f, -20.0f),
 
 		// Line 5
-		glm::vec3(-0.750f, -0.750f, -20.0f),
-		glm::vec3(-0.375f, -0.750f, -20.0f),
-		glm::vec3(0.375f, -0.750f, -20.0f),
-		glm::vec3(0.750f, -0.750f, -20.0f),
+		glm::vec3(-3.5f,   -5.0f, -20.0f),
+		glm::vec3(-1.167f, -5.0f, -20.0f),
+		glm::vec3(1.167f, -5.0f, -20.0f),
+		glm::vec3(3.5f,   -5.0f, -20.0f),
 	};
 
 	// setup buffers on the GPU
-	GLuint vbo, vao;
+	GLuint vbo, vao[20];
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // make it as working buffer (Active it)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // We used (GL_STATIC_DRAW) cuz our data is fixed
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao); // make as active one
+	for (int i = 0; i < 20; i++)
+	{
+		glGenVertexArrays(1, &vao[i]);
+		glBindVertexArray(vao[i]); // make as active one
 
-	// Positions
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0); // Position
-	glEnableVertexAttribArray(0);
+		// Positions
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0); // Position
+		glEnableVertexAttribArray(0);
 
-	// Colors
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat))); // texture
-	glEnableVertexAttribArray(1);
+		// Colors
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat))); // texture
+		glEnableVertexAttribArray(1);
+	}
 
 	ShaderProgram shaderProgram;
 	shaderProgram.loadShaders("res/shaders/transform.vert", "res/shaders/transform.frag");
@@ -208,51 +211,49 @@ int main() {
 		// Do some delay (to have smooth animation)
 		glfwSwapInterval(1);
 
-		// Model, View, and Projection
-		glm::mat4 model(1.0);
-		glm::mat4 view(1.0);
-		glm::mat4 projection(1.0);
-
-		// Create the Model matrix
-		cubeAngle += (float)(deltaTime * 50.0f);
-		if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
-
-		
-
-		// Create the View matrix
-		glm::vec3 camPos(0.0f, 0.0f, 0.0f);
-		glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
-		glm::vec3 up(0.0f, 1.0f, 0.0f);
-
-		view = glm::lookAt(camPos, camPos + targetPos, up);
-
-		// Create the Projection matrix
-		projection = glm::perspective(glm::radians(45.0f), (float)gWindowHeight / (float)gWindowWidth, 0.1f, 100.0f);
-
 		for (int i = 0; i < 20; i++)
 		{
-			model = glm::translate(model, cubesPositions[i]) * glm::rotate(model, glm::radians(cubeAngle), glm::vec3(1.0f, 1.0f, 0.0f));
-		
-		shaderProgram.setUniform("model", model);
-		shaderProgram.setUniform("view", view);
-		shaderProgram.setUniform("projection", projection);
+			// Model, View, and Projection
+			glm::mat4 model(1.0);
+			glm::mat4 view(1.0);
+			glm::mat4 projection(1.0);
 
-		// Drawing
-		glBindVertexArray(vao); // Bind
-		glDrawArrays(GL_TRIANGLES, 0, 36); // Draw
-		glBindVertexArray(0); // Unbind
-}
-		//=====================Drawing area=====================//
-		
+			// Create the Model matrix
+			cubeAngle += (float)(deltaTime * 50.0f);
+			if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
+
+			model = glm::translate(model, cubesPositions[i]) * glm::rotate(model, glm::radians(cubeAngle), glm::vec3(1.0f, 1.0f, 0.0f));
+
+			// Create the View matrix
+			glm::vec3 camPos(0.0f, 0.0f, 0.0f);
+			glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
+			glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+			view = glm::lookAt(camPos, camPos + targetPos, up);
+
+			// Create the Projection matrix
+			projection = glm::perspective(glm::radians(45.0f), (float)gWindowHeight / (float)gWindowWidth, 0.1f, 100.0f);
+
+			shaderProgram.setUniform("model", model);
+			shaderProgram.setUniform("view", view);
+			shaderProgram.setUniform("projection", projection);
+
+			// Drawing
+			glBindVertexArray(vao[i]); // Bind
+			glDrawArrays(GL_TRIANGLES, 0, 36); // Draw
+			glBindVertexArray(0); // Unbind
+		}
+
 		lastTime = currentTime;
+
+		//=====================Drawing area=====================//
 
 		// Swap the screen buffers (DOUBLE BUFFER CONCEPT)
 		glfwSwapBuffers(gmainWindow);
 	}
 
 	// Clean up
-
-	glDeleteVertexArrays(1, &vao);
+	glDeleteVertexArrays(20, vao);
 	glDeleteBuffers(1, &vbo);
 	glfwTerminate();
 
