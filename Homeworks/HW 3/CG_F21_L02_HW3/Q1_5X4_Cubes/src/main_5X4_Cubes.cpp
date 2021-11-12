@@ -123,36 +123,32 @@ int main() {
 
 	};
 
-	// Number of cubes we draw
-	const int rows = 5, cols = 4;
-	const int total = rows * cols;
-
 	// setup buffers on the GPU
-	GLuint vbo, vao[total];
+	GLuint vbo, vao;
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo); // make it as working buffer (Active it)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // We used (GL_STATIC_DRAW) cuz our data is fixed
 
-	// Creat a VAO for each cube to be drawen.
-	for (int i = 0; i < total; i++)
-	{
-		glGenVertexArrays(1, &vao[i]);
-		glBindVertexArray(vao[i]); // make as active one
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao); // make as active one
 
-		// Positions
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0); // Position
-		glEnableVertexAttribArray(0);
+	// Positions
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)0); // Position
+	glEnableVertexAttribArray(0);
 
-		// Colors
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat))); // texture
-		glEnableVertexAttribArray(1);
-	}
+	// Colors
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (GLvoid*)(3 * sizeof(GLfloat))); // texture
+	glEnableVertexAttribArray(1);
+
 
 	ShaderProgram shaderProgram;
 	shaderProgram.loadShaders("res/shaders/transform.vert", "res/shaders/transform.frag");
 
 	float curAngle = 0.0f;
+
+	// Number of cubes we draw
+	const int rows = 5, cols = 4;
 
 	// ########### Rendering loop (loop until window is closed) Game Loop ########### //
 	while (!glfwWindowShouldClose(gmainWindow)) {
@@ -168,7 +164,7 @@ int main() {
 		glfwSwapInterval(1);
 
 		float translateYOffset = 0.6f;
-		float c = 100.0f;
+		float colorProp = 100.0f; // To simulate color propagation
 		for (int i = 0; i < rows; i++)
 		{
 			float scaleFactor = 0.035f;
@@ -184,13 +180,13 @@ int main() {
 
 				// apply any transformation
 				transform = glm::translate(transform, glm::vec3(translateXOffset, translateYOffset, 0.0f));
-				transform = glm::rotate(transform, glm::radians(curAngle + c), glm::vec3(1.0f, 1.0f, 0.0f));
+				transform = glm::rotate(transform, glm::radians(curAngle + colorProp), glm::vec3(1.0f, 1.0f, 0.0f));
 				transform = glm::scale(transform, glm::vec3(scaleFactor, scaleFactor, scaleFactor));
 
 				shaderProgram.setUniform("transform", transform);
 
 				// Drawing
-				glBindVertexArray(vao[i]); // Bind
+				glBindVertexArray(vao); // Bind
 				glDrawArrays(GL_TRIANGLES, 0, 36); // Draw
 				glBindVertexArray(0); // Unbind
 
@@ -199,7 +195,7 @@ int main() {
 				// translate to the right
 				translateXOffset += (7.0f / 20.0f);
 				// To simulate color propagation
-				c = c - 10;
+				colorProp -= 10;
 			}
 			translateYOffset -= (7.0f / 25.0f);
 		}
@@ -211,7 +207,7 @@ int main() {
 	}
 
 	// Clean up
-	glDeleteVertexArrays(20, vao);
+	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(1, &vbo);
 	glfwTerminate();
 
