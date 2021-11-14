@@ -1,0 +1,11 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(499,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  Model.cpp
+C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Homeworks\HW 4\CG_F21_L02_HW4\Assimp_Models_Loading\src\Model.h(21,15): error C2061: syntax error: identifier 'Shader'
+C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Homeworks\HW 4\CG_F21_L02_HW4\Assimp_Models_Loading\src\Model.h(30,17): error C2065: 'Texture': undeclared identifier
+C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Homeworks\HW 4\CG_F21_L02_HW4\Assimp_Models_Loading\src\Model.h(30,10): error C2923: 'std::vector': 'Texture' is not a valid template type argument for parameter '_Ty'
+C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Homeworks\HW 4\CG_F21_L02_HW4\Assimp_Models_Loading\src\Model.h(30): message : see declaration of 'Texture'
+C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Homeworks\HW 4\CG_F21_L02_HW4\Assimp_Models_Loading\src\Model.h(30,10): error C2976: 'std::vector': too few template arguments
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\include\vector(443): message : see declaration of 'std::vector'
+  mainModelLoading.cpp
+  Mesh.cpp
+  Generating Code...
