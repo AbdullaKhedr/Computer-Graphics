@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// - Loading 3D Models from different file formats
+// - Assimp: Loading 3D Models from different file formats 
 //-----------------------------------------------------------------------------
 #include <iostream>
 #include <sstream>
@@ -10,9 +10,9 @@
 #include "glm/gtc/matrix_transform.hpp" //added for transform
 
 #include "ShaderProgram.h"
-#include "Texture.h"
 #include "Camera.h"
 #include "Mesh.h"
+#include "Model.h"
 
 // Global Variables
 const char* APP_TITLE = "CG HW4 Abdulla Khedr";
@@ -23,21 +23,6 @@ bool gWireframe = false;
 const std::string texture1Filename = "res/images/box.jpg";
 const std::string texture2Filename = "res/images/mario.png";
 const std::string floorImage = "res/images/floor1.jpg";
-
-// experiment with translation
-bool transDirection = true;
-float offset = 0.0f;
-float maxOffest = 0.7f;
-float increment = 0.01f;
-
-// experiment with rotation
-float curAngle = 0.0f;
-
-// experiment with scaling??
-bool sizeDirection = true;
-float curSize = 0.4f;
-float maxSize = 0.8f;
-float minSize = 0.1f;
 
 //FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(1.0, 1.0, 1.0));
 FPSCamera fpsCamera(glm::vec3(0.0f, 3.0f, 10.0f));
@@ -72,25 +57,9 @@ int main()
 	shaderProgram.loadShaders("res/shaders/projection.vert", "res/shaders/projection.frag");
 	//shaderProgramOneTex.loadShaders("res/shaders/camera.vert", "res/shaders/texture.frag");
 
-	// Load meshes and textures
-	const int numModels = 4;
-	Mesh mesh[numModels];
-	Texture texture[numModels];
-
-	mesh[0].loadOBJ("res/models/cylinder.obj");
-	//mesh[0].loadOBJ("res/models/Robot_l2.obj");
-	mesh[1].loadOBJ("res/models/woodcrate.obj");
-	mesh[2].loadOBJ("res/models/dolphinHighPoly.obj");
-	mesh[3].loadOBJ("res/models/floor.obj");
-	//mesh[3].loadOBJ("res/models/floor-pavement.obj"); //my floor
-
-	texture[0].loadTexture("res/models/cylinder.jpg", true);
-	//texture[0].loadTexture("res/models/Robot_diffuse.jpg", true);
-	texture[1].loadTexture("res/models/woodcrate_diffuse.jpg", true);
-	//texture[2].loadTexture("res/images/robot_diffuse.jpg", true);
-	texture[2].loadTexture("res/models/Dolphin_HighPolyUV.png", true);
-	//texture[3].loadTexture("res/images/tile_floor.jpg", true);
-	texture[3].loadTexture("res/models/Floor_ConcreteHerringbone.jpg", true); //my floor
+	// Load Models
+	const int numModels = 1;
+	Model ourModel("res/models/cylinder.obj");
 
 	// Model positions
 	glm::vec3 modelPos[] = {
@@ -153,9 +122,7 @@ int main()
 				model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			shaderProgram.setUniform("model", model);
 
-			texture[i].bind(0);		// set the texture before drawing.  Our simple OBJ mesh loader does not do materials yet.
-			mesh[i].draw();			// Render the OBJ mesh
-			texture[i].unbind(0);
+			ourModel.draw(shaderProgram);
 		}
 
 		// Draw the floor
