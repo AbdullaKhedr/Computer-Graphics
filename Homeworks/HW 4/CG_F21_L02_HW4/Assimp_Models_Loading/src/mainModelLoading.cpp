@@ -20,9 +20,6 @@ int gWindowWidth = 1200;
 int gWindowHeight = 900;
 GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
-const std::string texture1Filename = "res/images/box.jpg";
-const std::string texture2Filename = "res/images/mario.png";
-const std::string floorImage = "res/images/floor1.jpg";
 
 //FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(1.0, 1.0, 1.0));
 FPSCamera fpsCamera(glm::vec3(0.0f, 3.0f, 10.0f));
@@ -51,22 +48,24 @@ int main()
 		std::cerr << "GLFW initialization failed" << std::endl;
 		return -1;
 	}
-
+	
 	//setting shaders
 	ShaderProgram shaderProgram, shaderProgramOneTex;
 	shaderProgram.loadShaders("res/shaders/projection.vert", "res/shaders/projection.frag");
 	//shaderProgramOneTex.loadShaders("res/shaders/camera.vert", "res/shaders/texture.frag");
 
 	// Load Models
-	const int numModels = 1;
-	Model ourModel("res/models/cylinder.obj");
+	const int numModels = 3;
+	Model ourModels[numModels];
+	
+	ourModels[0].loadModel("res/models/woodcrate.obj");
+	ourModels[1].loadModel("res/models/cylinder.obj");
+	ourModels[2].loadModel("res/models/floor.obj");
 
 	// Model positions
 	glm::vec3 modelPos[] = {
 		glm::vec3(-2.5f,1.4f, 0.0f),	// cylinder
 		glm::vec3(2.5f, 1.0f, 0.0f),	// crate
-		//glm::vec3(0.0f, 0.0f, -2.0f),	// robot
-		glm::vec3(0.0f, 4.0f, 0.0f),	// dolphin
 		glm::vec3(0.0f, 0.0f, 0.0f)		// floor
 	};
 
@@ -74,8 +73,6 @@ int main()
 	glm::vec3 modelScale[] = {
 		glm::vec3(0.7f, 0.7f, 0.7f),	// cylinder
 		glm::vec3(1.0f, 1.0f, 1.0f),	// crate
-		//glm::vec3(1.0f, 1.0f, 1.0f),	// robot
-		glm::vec3(4.0f, 4.0f, 4.0f),	// dolphin
 		glm::vec3(10.0f, 1.0f, 10.0f)	// floor
 	};
 
@@ -121,8 +118,9 @@ int main()
 			if (i == 2) // rotaion only for dolfen
 				model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			shaderProgram.setUniform("model", model);
+			
+			ourModels[i].Draw(shaderProgram);
 
-			ourModel.draw(shaderProgram);
 		}
 
 		// Draw the floor
