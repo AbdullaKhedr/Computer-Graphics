@@ -54,13 +54,16 @@ int main()
 	shaderProgram.loadShaders("res/shaders/projection.vert", "res/shaders/projection.frag");
 	//shaderProgramOneTex.loadShaders("res/shaders/camera.vert", "res/shaders/texture.frag");
 
-	// Load Models
+	// ********************************************* NEW CODE *********************************************************
+	// Load Models 
 	const int numModels = 3;
 	Model ourModels[numModels];
 	
 	ourModels[0].loadModel("res/models/woodcrate.obj");
 	ourModels[1].loadModel("res/models/cylinder.obj");
 	ourModels[2].loadModel("res/models/floor.obj");
+
+	// ********************************************* NEW CODE *********************************************************
 
 	// Model positions
 	glm::vec3 modelPos[] = {
@@ -119,6 +122,7 @@ int main()
 				model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			shaderProgram.setUniform("model", model);
 			
+			// ********************************************* NEW CODE *********************************************************
 			ourModels[i].Draw(shaderProgram);
 
 		}
