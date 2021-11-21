@@ -1,1 +1,5 @@
-﻿
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(499,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  mainModelLoading.cpp
+C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Project\CG_Course_Project\Solar_System\src\Mesh.h(81,70): warning C4244: 'argument': conversion from 'unsigned int' to 'const float', possible loss of data
+C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Project\CG_Course_Project\Solar_System\src\Model.h(8,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  Solar_System.vcxproj -> C:\Users\hp\Desktop\Computer Graphics\Code\Computer-Graphics\Project\CG_Course_Project\Solar_System\bin\Solar_System.exe

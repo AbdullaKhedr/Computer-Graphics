@@ -1,14 +1,15 @@
 //-----------------------------------------------------------------------------
-// - Assimp: Loading 3D Models from different file formats 
+// - Computer Graphics Course Project
+// - 3D Model Simulates The Solar System 
+// - Using Assimp Library For Loading 3D Models from different file formats 
 //-----------------------------------------------------------------------------
 #include <iostream>
 #include <sstream>
 #define GLEW_STATIC
-#include "GL/glew.h"	// Important - this header must come before glfw3 header
+#include "GL/glew.h" // Important - this header must come before glfw3 header
 #include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp" //added for transform
-
+#include "glm/gtc/matrix_transform.hpp" // added for transform
 #include "ShaderProgram.h"
 #include "Camera.h"
 #include "Mesh.h"
@@ -21,14 +22,15 @@ int gWindowHeight = 900;
 GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
 
-//FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(1.0, 1.0, 1.0));
-FPSCamera fpsCamera(glm::vec3(0.0f, 3.0f, 10.0f));
+// Camera Settings
+FPSCamera fpsCamera(glm::vec3(-20.0f, 10.0f, 10.0f));
 
+// Control Settings
 const double ZOOM_SENSITIVITY = -3.0;
 const float MOVE_SPEED = 5.0; // units per second
 const float MOUSE_SENSITIVITY = 0.1f;
 
-// Function prototypes
+// Functions prototypes
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void glfw_onFramebufferSize(GLFWwindow* window, int width, int height);
 void glfw_onMouseScroll(GLFWwindow* window, double deltaX, double deltaY);
@@ -48,42 +50,59 @@ int main()
 		std::cerr << "GLFW initialization failed" << std::endl;
 		return -1;
 	}
-	
-	//setting shaders
+
+	// Print Graphics Card Info
+	Print_OpenGL_Version_Information();
+
+	// Setting shaders
 	ShaderProgram shaderProgram, shaderProgramOneTex;
 	shaderProgram.loadShaders("res/shaders/projection.vert", "res/shaders/projection.frag");
-	//shaderProgramOneTex.loadShaders("res/shaders/camera.vert", "res/shaders/texture.frag");
 
-	// ********************************************* NEW CODE *********************************************************
 	// Load Models 
-	const int numModels = 3;
+	const int numModels = 10;
 	Model ourModels[numModels];
-	
+
 	ourModels[0].loadModel("res/models/Sun/Sun.obj");
-	ourModels[1].loadModel("res/models/Saturn/Saturn.obj");
-	ourModels[2].loadModel("res/models/floor.obj");
+	ourModels[1].loadModel("res/models/Mercury/Mercury.obj");
+	ourModels[2].loadModel("res/models/Venus/Venus.obj");
+	ourModels[3].loadModel("res/models/Earth/Earth.obj");
+	ourModels[4].loadModel("res/models/Earth/Moon.obj");
+	ourModels[5].loadModel("res/models/Mars/Mars.obj");
+	ourModels[6].loadModel("res/models/Cerfs/Cerfs.obj");
+	ourModels[7].loadModel("res/models/Saturn/Saturn.obj");
+	ourModels[8].loadModel("res/models/Uranus/Uranus.obj");
+	ourModels[9].loadModel("res/models/Neptune/Neptune.obj");
 
-	// ********************************************* NEW CODE *********************************************************
-
-	// Model positions
+	// Model Positions
 	glm::vec3 modelPos[] = {
-		glm::vec3(0.0f, 0.0f, 0.0f),	// cylinder
-		glm::vec3(10.0f, 0.0f, 0.0f),	// crate
-		glm::vec3(20.0f, 0.0f, 0.0f)		// floor
+		glm::vec3(0.0f, 0.0f, 0.0f), // The Sun (Light)
+		glm::vec3(10.0f, 0.0f, 0.0f), // Mercury
+		glm::vec3(20.0f, 0.0f, 0.0f), // Venus
+		glm::vec3(30.0f, 0.0f, 0.0f), // Earth
+		glm::vec3(40.0f, 0.0f, 0.0f), // Earth - Moon
+		glm::vec3(50.0f, 0.0f, 0.0f), // Mars
+		glm::vec3(60.0f, 0.0f, 0.0f), // Cerfs
+		glm::vec3(70.0f, 0.0f, 0.0f), // Saturn
+		glm::vec3(80.0f, 0.0f, 0.0f), // Uranus
+		glm::vec3(90.0f, 0.0f, 0.0f)  // Neptune
 	};
 
-	// Model scale
+	// Model Scale
 	glm::vec3 modelScale[] = {
-		glm::vec3(1.0f, 1.0f, 1.0f),	// cylinder
-		glm::vec3(1.0f, 1.0f, 1.0f),	// crate
-		glm::vec3(1.0f, 1.0f, 1.0f)	// floor
+		glm::vec3(1.0f, 1.0f, 1.0f), // The Sun (Light)
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f),
 	};
 
 	double lastTime = glfwGetTime();
-	float cubeAngle = 0.0f;
-
-	//print card info
-	Print_OpenGL_Version_Information();
+	float curAngle = 0.0f;
 
 	// Rendering loop 
 	while (!glfwWindowShouldClose(gWindow))
@@ -92,6 +111,8 @@ int main()
 
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
+
+		curAngle += 0.1f;
 
 		// Poll for and process events
 		glfwPollEvents();
@@ -117,18 +138,18 @@ int main()
 		// Render the scene
 		for (int i = 0; i < numModels; i++)
 		{
+			// Set the Positions, and Scale for each Model
 			model = glm::translate(glm::mat4(1.0), modelPos[i]) * glm::scale(glm::mat4(1.0), modelScale[i]);
-			if (i == 2) // rotaion only for dolfen
-				model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+			// Set the Rotations
+			if (i == 0) // Rotate the Sun around itself
+				model = glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+
 			shaderProgram.setUniform("model", model);
-			
+
 			// ********************************************* NEW CODE *********************************************************
 			ourModels[i].Draw(shaderProgram);
-
 		}
-
-		// Draw the floor
-	/*	glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
 		glBindVertexArray(0);
 
@@ -192,7 +213,7 @@ bool initOpenGL()
 	glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPos(gWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
 
-	glClearColor(0.3f, 0.4f, 0.6f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Define the viewport dimensions
 	glViewport(0, 0, gWindowWidth, gWindowHeight);
