@@ -27,7 +27,7 @@ FPSCamera fpsCamera(glm::vec3(-20.0f, 10.0f, 10.0f));
 
 // Control Settings
 const double ZOOM_SENSITIVITY = -3.0;
-const float MOVE_SPEED = 5.0; // units per second
+const float MOVE_SPEED = 40.0; // units per second
 const float MOUSE_SENSITIVITY = 0.1f;
 
 // Functions prototypes
@@ -66,39 +66,39 @@ int main()
 	ourModels[1].loadModel("res/models/Mercury/Mercury.obj");
 	ourModels[2].loadModel("res/models/Venus/Venus.obj");
 	ourModels[3].loadModel("res/models/Earth/Earth.obj");
-	ourModels[4].loadModel("res/models/Earth/Moon.obj");
+	ourModels[4].loadModel("res/models/Earth/Moon/Moon.obj");
 	ourModels[5].loadModel("res/models/Mars/Mars.obj");
-	ourModels[6].loadModel("res/models/Cerfs/Cerfs.obj");
+	ourModels[6].loadModel("res/models/Ceres/Ceres.obj");
 	ourModels[7].loadModel("res/models/Saturn/Saturn.obj");
 	ourModels[8].loadModel("res/models/Uranus/Uranus.obj");
 	ourModels[9].loadModel("res/models/Neptune/Neptune.obj");
 
 	// Model Positions
 	glm::vec3 modelPos[] = {
-		glm::vec3(0.0f, 0.0f, 0.0f), // The Sun (Light)
+		glm::vec3(00.0f, 0.0f, 0.0f), // The Sun (Light)
 		glm::vec3(10.0f, 0.0f, 0.0f), // Mercury
 		glm::vec3(20.0f, 0.0f, 0.0f), // Venus
 		glm::vec3(30.0f, 0.0f, 0.0f), // Earth
-		glm::vec3(40.0f, 0.0f, 0.0f), // Earth - Moon
+		glm::vec3(35.0f, 0.0f, 0.0f), // Earth - Moon
 		glm::vec3(50.0f, 0.0f, 0.0f), // Mars
-		glm::vec3(60.0f, 0.0f, 0.0f), // Cerfs
-		glm::vec3(70.0f, 0.0f, 0.0f), // Saturn
-		glm::vec3(80.0f, 0.0f, 0.0f), // Uranus
-		glm::vec3(90.0f, 0.0f, 0.0f)  // Neptune
+		glm::vec3(70.0f, 0.0f, 0.0f), // Ceres
+		glm::vec3(80.0f, 0.0f, 0.0f), // Saturn
+		glm::vec3(90.0f, 0.0f, 0.0f), // Uranus
+		glm::vec3(100.0f, 0.0f, 0.0f)  // Neptune
 	};
 
 	// Model Scale
 	glm::vec3 modelScale[] = {
 		glm::vec3(1.0f, 1.0f, 1.0f), // The Sun (Light)
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(1.0f, 1.0f, 1.0f), // Mercury
+		glm::vec3(1.0f, 1.0f, 1.0f), // Venus
+		glm::vec3(1.0f, 1.0f, 1.0f), // Earth
+		glm::vec3(1.0f, 1.0f, 1.0f), // Earth - Moon
+		glm::vec3(1.0f, 1.0f, 1.0f), // Mars
+		glm::vec3(1.0f, 1.0f, 1.0f), // Ceres
+		glm::vec3(1.0f, 1.0f, 1.0f), // Saturn
+		glm::vec3(1.0f, 1.0f, 1.0f), // Uranus
+		glm::vec3(1.0f, 1.0f, 1.0f), // Neptune
 	};
 
 	double lastTime = glfwGetTime();
@@ -112,7 +112,7 @@ int main()
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
 
-		curAngle += 0.1f;
+		curAngle += 0.05f;
 
 		// Poll for and process events
 		glfwPollEvents();
@@ -138,12 +138,47 @@ int main()
 		// Render the scene
 		for (int i = 0; i < numModels; i++)
 		{
+			/*
+			* glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f)) *
+				glm::translate(glm::mat4(1.0), modelPos[i]) *
+				glm::scale(glm::mat4(1.0), modelScale[i]) *
+				glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+			*/
+
 			// Set the Positions, and Scale for each Model
 			model = glm::translate(glm::mat4(1.0), modelPos[i]) * glm::scale(glm::mat4(1.0), modelScale[i]);
 
-			// Set the Rotations
-			if (i == 0) // Rotate the Sun around itself
-				model = glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+			// Set the Rotations for each planet
+			switch (i)
+			{
+			case 0: // Sun
+				model = model * glm::rotate(glm::mat4(1.0), glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+				break;
+			case 1:
+				model = glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 3), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+				break;
+			case 2:
+
+				break;
+			case 3:
+
+				break;
+			case 4:
+
+				break;
+			case 5:
+
+				break;
+			case 6:
+
+				break;
+			case 7:
+
+				break;
+			default:
+				break;
+			}
 
 			shaderProgram.setUniform("model", model);
 
