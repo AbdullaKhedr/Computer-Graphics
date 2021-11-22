@@ -39,4 +39,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\lighting-phong-mat-point.frag" />
+    <None Include="res\shaders\lighting-phong-mat-point.vert" />
+    <None Include="res\shaders\lamp.frag" />
+    <None Include="res\shaders\lamp.vert" />
+  </ItemGroup>
 </Project>

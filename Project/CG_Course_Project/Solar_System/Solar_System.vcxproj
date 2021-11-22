@@ -29,6 +29,12 @@
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\ShaderProgram.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\lamp.frag" />
+    <None Include="res\shaders\lamp.vert" />
+    <None Include="res\shaders\lighting-phong-mat-point.frag" />
+    <None Include="res\shaders\lighting-phong-mat-point.vert" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

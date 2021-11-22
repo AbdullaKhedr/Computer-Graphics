@@ -58,9 +58,9 @@ int main()
 	ShaderProgram shaderProgram;
 	shaderProgram.loadShaders("res/shaders/lighting-phong-mat-point.vert", "res/shaders/lighting-phong-mat-point.frag");
 	
-	//// Setting light shaders
-	//ShaderProgram lightShader;
-	//shaderProgram.loadShaders("res/shaders/lamp.vert", "res/shaders/lamp.frag");
+	// Setting light shaders
+	ShaderProgram lightShader;
+	lightShader.loadShaders("res/shaders/lamp.vert", "res/shaders/lamp.frag");
 
 	// Load Models 
 	const int numModels = 10;
@@ -154,19 +154,19 @@ int main()
 		shaderProgram.setUniform("pointLight.diffuse", lightColor);
 		shaderProgram.setUniform("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 		shaderProgram.setUniform("pointLight.position", lightPos);
-		shaderProgram.setUniform("pointLight.constant", 1);
-		shaderProgram.setUniform("pointLight.linear", 0.07f);
-		shaderProgram.setUniform("pointLight.exponent", 0.108f);
+		shaderProgram.setUniform("pointLight.constant", 0.01);
+		shaderProgram.setUniform("pointLight.linear", 0.0007f);
+		shaderProgram.setUniform("pointLight.exponent", 0.008f);
 
-		// Render the scene
-		for (int i = 0; i < numModels; i++)
+		// Render the scene (The planets after the Sun)
+		for (int i = 1; i < numModels; i++)
 		{
 			glm::mat4 mat = glm::mat4(1.0);
 			// Set the Positions, and Scale for each Model
 			model = glm::translate(mat, modelPos[i]) * glm::scale(mat, modelScale[i]);
 
 			// Set the material properties for models
-			shaderProgram.setUniform("material.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+			shaderProgram.setUniform("material.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
 			shaderProgram.setUniformSampler("material.diffuseMap", 0);
 			shaderProgram.setUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 			shaderProgram.setUniform("material.shininess", 45.0f);
@@ -174,9 +174,7 @@ int main()
 			// Set the Rotations for each planet
 			switch (i)
 			{
-			case 0: // Sun
-				model = model * glm::rotate(mat, glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-				break;
+			
 			//case 1: // Mercury
 			//	model = glm::rotate(mat, glm::radians(curAngle * 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
 			//		* glm::rotate(mat, glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -220,10 +218,18 @@ int main()
 			shaderProgram.setUniform("model", model);
 
 			// ********************************************* NEW CODE *********************************************************
-			ourModels[i].Draw(shaderProgram);
+			ourModels[i].Draw(shaderProgram);			
 		}
 
-		glBindVertexArray(0);
+		// Render the Light (Sun)
+		model = glm::translate(glm::mat4(1.0), modelPos[0]) * glm::scale(glm::mat4(1.0), modelScale[0])
+			* glm::rotate(glm::mat4(1.0), glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+		lightShader.use();
+		lightShader.setUniform("model", model);
+		lightShader.setUniform("view", view);
+		lightShader.setUniform("projection", projection);
+		lightShader.setUniform("lightColor", lightColor);
+		ourModels[0].Draw(lightShader);
 
 		// Swap front and back buffers
 		glfwSwapBuffers(gWindow);
