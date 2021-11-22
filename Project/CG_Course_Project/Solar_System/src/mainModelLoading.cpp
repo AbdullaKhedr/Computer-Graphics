@@ -16,7 +16,7 @@
 #include "Model.h"
 
 // Global Variables
-const char* APP_TITLE = "CG HW4 Abdulla Khedr";
+const char* APP_TITLE = "CG Project - Solar System - Abdulla Khedr";
 int gWindowWidth = 1200;
 int gWindowHeight = 900;
 GLFWwindow* gWindow = NULL;
