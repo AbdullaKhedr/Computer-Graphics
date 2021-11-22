@@ -27,7 +27,7 @@ FPSCamera fpsCamera(glm::vec3(-20.0f, 10.0f, 10.0f));
 
 // Control Settings
 const double ZOOM_SENSITIVITY = -3.0;
-const float MOVE_SPEED = 40.0; // units per second
+const float MOVE_SPEED = 10.0; // units per second
 const float MOUSE_SENSITIVITY = 0.1f;
 
 // Functions prototypes
@@ -55,8 +55,8 @@ int main()
 	Print_OpenGL_Version_Information();
 
 	// Setting shaders
-	ShaderProgram shaderProgram, shaderProgramOneTex;
-	shaderProgram.loadShaders("res/shaders/projection.vert", "res/shaders/projection.frag");
+	ShaderProgram shaderProgram;
+	shaderProgram.loadShaders("res/shaders/lighting-phong-mat-dir-point.vert", "res/shaders/lighting-phong-mat-dir-point.frag");
 
 	// Load Models 
 	const int numModels = 10;
@@ -75,30 +75,30 @@ int main()
 
 	// Model Positions
 	glm::vec3 modelPos[] = {
-		glm::vec3(00.0f, 0.0f, 0.0f), // The Sun (Light)
-		glm::vec3(10.0f, 0.0f, 0.0f), // Mercury
-		glm::vec3(20.0f, 0.0f, 0.0f), // Venus
-		glm::vec3(30.0f, 0.0f, 0.0f), // Earth
-		glm::vec3(35.0f, 0.0f, 0.0f), // Earth - Moon
-		glm::vec3(50.0f, 0.0f, 0.0f), // Mars
-		glm::vec3(70.0f, 0.0f, 0.0f), // Ceres
-		glm::vec3(80.0f, 0.0f, 0.0f), // Saturn
-		glm::vec3(90.0f, 0.0f, 0.0f), // Uranus
-		glm::vec3(100.0f, 0.0f, 0.0f)  // Neptune
+		glm::vec3(0.0f, 0.0f, 0.0f), // The Sun (Light)
+		glm::vec3(5.0f, 0.0f, 0.0f), // Mercury
+		glm::vec3(8.0f, 0.0f, 0.0f), // Venus
+		glm::vec3(12.0f, 0.0f, 0.0f), // Earth
+		glm::vec3(14.0f, 0.0f, 0.0f), // Earth - Moon
+		glm::vec3(17.0f, 0.0f, 0.0f), // Mars
+		glm::vec3(22.0f, 0.0f, 0.0f), // Ceres
+		glm::vec3(30.0f, 0.0f, 0.0f), // Saturn
+		glm::vec3(38.0f, 0.0f, 0.0f), // Uranus
+		glm::vec3(43.0f, 0.0f, 0.0f)  // Neptune
 	};
 
 	// Model Scale
 	glm::vec3 modelScale[] = {
 		glm::vec3(1.0f, 1.0f, 1.0f), // The Sun (Light)
-		glm::vec3(1.0f, 1.0f, 1.0f), // Mercury
-		glm::vec3(1.0f, 1.0f, 1.0f), // Venus
-		glm::vec3(1.0f, 1.0f, 1.0f), // Earth
-		glm::vec3(1.0f, 1.0f, 1.0f), // Earth - Moon
-		glm::vec3(1.0f, 1.0f, 1.0f), // Mars
+		glm::vec3(0.2f, 0.2f, 0.2f), // Mercury
+		glm::vec3(0.4f, 0.4f, 0.4f), // Venus
+		glm::vec3(0.6f, 0.6f, 0.6f), // Earth
+		glm::vec3(0.7f, 0.7f, 0.7f), // Earth - Moon
+		glm::vec3(0.3f, 0.3f, 0.3f), // Mars
 		glm::vec3(1.0f, 1.0f, 1.0f), // Ceres
-		glm::vec3(1.0f, 1.0f, 1.0f), // Saturn
-		glm::vec3(1.0f, 1.0f, 1.0f), // Uranus
-		glm::vec3(1.0f, 1.0f, 1.0f), // Neptune
+		glm::vec3(0.9f, 0.9f, 0.9f), // Saturn
+		glm::vec3(0.8f, 0.8f, 0.8f), // Uranus
+		glm::vec3(0.3f, 0.3f, 0.3f), // Neptune
 	};
 
 	double lastTime = glfwGetTime();
@@ -138,44 +138,52 @@ int main()
 		// Render the scene
 		for (int i = 0; i < numModels; i++)
 		{
-			/*
-			* glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f)) *
-				glm::translate(glm::mat4(1.0), modelPos[i]) *
-				glm::scale(glm::mat4(1.0), modelScale[i]) *
-				glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-			*/
-
+			glm::mat4 mat = glm::mat4(1.0);
 			// Set the Positions, and Scale for each Model
-			model = glm::translate(glm::mat4(1.0), modelPos[i]) * glm::scale(glm::mat4(1.0), modelScale[i]);
+			model = glm::translate(mat, modelPos[i]) * glm::scale(mat, modelScale[i]);
 
 			// Set the Rotations for each planet
 			switch (i)
 			{
 			case 0: // Sun
-				model = model * glm::rotate(glm::mat4(1.0), glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+				model = model * glm::rotate(mat, glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 				break;
-			case 1:
-				model = glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 3), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-				break;
-			case 2:
-
-				break;
-			case 3:
-
-				break;
-			case 4:
-
-				break;
-			case 5:
-
-				break;
-			case 6:
-
-				break;
-			case 7:
-
-				break;
+			//case 1: // Mercury
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 2: // Venus
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.3f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 1.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 3: // Earth
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.6f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 4: // Earth - Moon
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.6f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 5: // Mars
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 4), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 6: // Ceres
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.4f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 7: // Saturn
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.8f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 8: // Uranus
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.7f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
+			//case 9: // Neptune
+			//	model = glm::rotate(mat, glm::radians(curAngle * 0.3f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+			//	break;
 			default:
 				break;
 			}
