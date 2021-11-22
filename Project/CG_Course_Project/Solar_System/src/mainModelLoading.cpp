@@ -23,7 +23,7 @@ GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
 
 // Camera Settings
-FPSCamera fpsCamera(glm::vec3(-20.0f, 10.0f, 10.0f));
+FPSCamera fpsCamera(glm::vec3(-20.0f, 40.0f, 90.0f), glm::vec3(20.0f, 0.0f, -10.0f));
 
 // Control Settings
 const double ZOOM_SENSITIVITY = -3.0;
@@ -57,7 +57,7 @@ int main()
 	// Setting shaders
 	ShaderProgram shaderProgram;
 	shaderProgram.loadShaders("res/shaders/lighting-phong-mat-point.vert", "res/shaders/lighting-phong-mat-point.frag");
-	
+
 	// Setting light shaders
 	ShaderProgram lightShader;
 	lightShader.loadShaders("res/shaders/lamp.vert", "res/shaders/lamp.frag");
@@ -77,32 +77,68 @@ int main()
 	ourModels[8].loadModel("res/models/Uranus/Uranus.obj");
 	ourModels[9].loadModel("res/models/Neptune/Neptune.obj");
 
+	// Simulating the stars in the outer space
+	Model star;
+	star.loadModel("res/models/Stars/Star.obj");
+	const int starsNum = 400;
+	glm::vec3 p[starsNum];
+	glm::vec3 s[starsNum];
+	int min = -100, max = 100;
+	int redArea = 30; // Range from -50 to 50 on x, y, z should not have any stars 
+	for (int i = 0; i < starsNum; i++)
+	{
+		float pX = rand() % (max - min + 1) + min;
+		float pY = rand() % (max - min + 1) + min;
+		float pZ = rand() % (max - min + 1) + min;
+
+		if (pX >= 0)
+			pX += redArea;
+		if (pY >= 0)
+			pY += redArea;
+		if (pZ >= 0)
+			pZ += redArea;
+		
+		if (pX < 0)
+			pX -= redArea;
+		if (pY < 0)
+			pY -= redArea;
+		if (pZ < 0)
+			pZ -= redArea;
+
+		cout << "(" << pX << ", " << pY << ", " << pZ << ")" << endl; // position of a star
+
+		float sc = rand() % (1 - 0 + 1) + 0;
+
+		p[i] = glm::vec3(pX, pY, pZ);
+		s[i] = glm::vec3(sc + 0.1, sc + 0.1, sc + 0.1);
+	}
+
 	// Model Positions
 	glm::vec3 modelPos[] = {
 		glm::vec3(0.0f, 0.0f, 0.0f), // The Sun (Light)
-		glm::vec3(5.0f, 0.0f, 0.0f), // Mercury
-		glm::vec3(8.0f, 0.0f, 0.0f), // Venus
-		glm::vec3(12.0f, 0.0f, 0.0f), // Earth
-		glm::vec3(14.0f, 0.0f, 0.0f), // Earth - Moon
-		glm::vec3(17.0f, 0.0f, 0.0f), // Mars
-		glm::vec3(22.0f, 0.0f, 0.0f), // Ceres
-		glm::vec3(30.0f, 0.0f, 0.0f), // Saturn
-		glm::vec3(38.0f, 0.0f, 0.0f), // Uranus
-		glm::vec3(43.0f, 0.0f, 0.0f)  // Neptune
+		glm::vec3(10.0f, 0.0f, 0.0f), // Mercury
+		glm::vec3(18.0f, 0.0f, 0.0f), // Venus
+		glm::vec3(24.0f, 0.0f, 0.0f), // Earth - Moon
+		glm::vec3(29.0f, 0.0f, 0.0f), // Earth
+		glm::vec3(32.0f, 0.0f, 0.0f), // Mars
+		glm::vec3(44.0f, 0.0f, 0.0f), // Ceres
+		glm::vec3(60.0f, 0.0f, 0.0f), // Saturn
+		glm::vec3(76.0f, 0.0f, 0.0f), // Uranus
+		glm::vec3(86.0f, 0.0f, 0.0f)  // Neptune
 	};
 
 	// Model Scale
 	glm::vec3 modelScale[] = {
-		glm::vec3(1.0f, 1.0f, 1.0f), // The Sun (Light)
-		glm::vec3(0.2f, 0.2f, 0.2f), // Mercury
-		glm::vec3(0.4f, 0.4f, 0.4f), // Venus
-		glm::vec3(0.6f, 0.6f, 0.6f), // Earth
-		glm::vec3(0.7f, 0.7f, 0.7f), // Earth - Moon
-		glm::vec3(0.3f, 0.3f, 0.3f), // Mars
-		glm::vec3(1.0f, 1.0f, 1.0f), // Ceres
-		glm::vec3(0.9f, 0.9f, 0.9f), // Saturn
-		glm::vec3(0.8f, 0.8f, 0.8f), // Uranus
-		glm::vec3(0.3f, 0.3f, 0.3f), // Neptune
+		glm::vec3(2.0f, 2.0f, 2.0f), // The Sun (Light)
+		glm::vec3(0.6f, 0.6f, 0.6f), // Mercury
+		glm::vec3(0.8f, 0.8f, 0.8f), // Venus
+		glm::vec3(1.2f, 1.2f, 1.2f), // Earth
+		glm::vec3(1.4f, 1.4f, 1.4f), // Earth - Moon
+		glm::vec3(0.6f, 0.6f, 0.6f), // Mars
+		glm::vec3(2.0f, 2.0f, 2.0f), // Ceres
+		glm::vec3(1.8f, 1.8f, 1.8f), // Saturn
+		glm::vec3(1.6f, 1.6f, 1.6f), // Uranus
+		glm::vec3(0.6f, 0.6f, 0.6f), // Neptune
 	};
 
 	double lastTime = glfwGetTime();
@@ -116,7 +152,7 @@ int main()
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
 
-		curAngle += 0.05f;
+		curAngle += 0.2f;
 
 		// Poll for and process events
 		glfwPollEvents();
@@ -141,7 +177,7 @@ int main()
 
 		// Set light properties (pos, color)
 		glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
-		glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+		glm::vec3 lightColor(1.0f, 1.0f, 0.8f);
 
 		shaderProgram.use();
 
@@ -150,13 +186,13 @@ int main()
 		shaderProgram.setUniform("projection", projection);
 		shaderProgram.setUniform("viewPos", viewPos);
 		// Set Point light
-		shaderProgram.setUniform("pointLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		shaderProgram.setUniform("pointLight.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
 		shaderProgram.setUniform("pointLight.diffuse", lightColor);
-		shaderProgram.setUniform("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		shaderProgram.setUniform("pointLight.specular", glm::vec3(0.0f, 0.0f, 0.0f));
 		shaderProgram.setUniform("pointLight.position", lightPos);
-		shaderProgram.setUniform("pointLight.constant", 0.01);
-		shaderProgram.setUniform("pointLight.linear", 0.0007f);
-		shaderProgram.setUniform("pointLight.exponent", 0.008f);
+		shaderProgram.setUniform("pointLight.constant", 0.8f); // More = Less light
+		shaderProgram.setUniform("pointLight.linear", 0.0f); // ??
+		shaderProgram.setUniform("pointLight.exponent", 0.0000001f); // Less = Far reaching for the light
 
 		// Render the scene (The planets after the Sun)
 		for (int i = 1; i < numModels; i++)
@@ -166,70 +202,75 @@ int main()
 			model = glm::translate(mat, modelPos[i]) * glm::scale(mat, modelScale[i]);
 
 			// Set the material properties for models
-			shaderProgram.setUniform("material.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
-			shaderProgram.setUniformSampler("material.diffuseMap", 0);
-			shaderProgram.setUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+			shaderProgram.setUniform("material.ambient", glm::vec3(0.1f, 0.1f, 0.1f));
+			shaderProgram.setUniformSampler("material.diffuseMap", 0.6f);
+			shaderProgram.setUniform("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
 			shaderProgram.setUniform("material.shininess", 45.0f);
 
 			// Set the Rotations for each planet
 			switch (i)
 			{
-			
-			//case 1: // Mercury
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 2: // Venus
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.3f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 1.5f), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 3: // Earth
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.6f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 4: // Earth - Moon
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.6f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 5: // Mars
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 4), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 6: // Ceres
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.4f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 7: // Saturn
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.8f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 8: // Uranus
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.7f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			//case 9: // Neptune
-			//	model = glm::rotate(mat, glm::radians(curAngle * 0.3f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-			//		* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-			//	break;
-			default:
+				//case 0: // Sun
+				//	model = model * glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+				//	break;
+			case 1: // Mercury
+				model = glm::rotate(mat, glm::radians(-curAngle * 1.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 2: // Venus
+				model = glm::rotate(mat, glm::radians(-curAngle * 1.2f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(curAngle * 1.5f), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 3: // Earth
+				model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 4: // Earth - Moon
+				model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(-curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 5: // Mars
+				model = glm::rotate(mat, glm::radians(-curAngle * 2.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(-curAngle * 4), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 6: // Ceres
+				model = glm::rotate(mat, glm::radians(-curAngle * 3.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 7: // Saturn
+				model = glm::rotate(mat, glm::radians(-curAngle * 4.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 8: // Uranus
+				model = glm::rotate(mat, glm::radians(-curAngle * 3.7f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
+				break;
+			case 9: // Neptune
+				model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
 				break;
 			}
-
 			shaderProgram.setUniform("model", model);
 
-			// ********************************************* NEW CODE *********************************************************
-			ourModels[i].Draw(shaderProgram);			
+			ourModels[i].Draw(shaderProgram); // Draw
 		}
 
 		// Render the Light (Sun)
 		model = glm::translate(glm::mat4(1.0), modelPos[0]) * glm::scale(glm::mat4(1.0), modelScale[0])
-			* glm::rotate(glm::mat4(1.0), glm::radians(curAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+			* glm::rotate(glm::mat4(1.0), glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
 		lightShader.use();
 		lightShader.setUniform("model", model);
 		lightShader.setUniform("view", view);
 		lightShader.setUniform("projection", projection);
 		lightShader.setUniform("lightColor", lightColor);
 		ourModels[0].Draw(lightShader);
+
+		for (int i = 0; i < starsNum; i++)
+		{
+			model = glm::translate(glm::mat4(1.0), p[i]) * glm::scale(glm::mat4(1.0), s[i]);
+			lightShader.setUniform("model", model);
+			star.Draw(lightShader);
+		}
 
 		// Swap front and back buffers
 		glfwSwapBuffers(gWindow);
@@ -241,7 +282,6 @@ int main()
 
 	return 0;
 }
-
 
 //-----------------------------------------------------------------------------
 // Initialize GLFW and OpenGL
@@ -415,6 +455,7 @@ void showFPS(GLFWwindow* window)
 
 	frameCount++;
 }
+
 // Print OpenGL version information
 void Print_OpenGL_Version_Information()
 {
