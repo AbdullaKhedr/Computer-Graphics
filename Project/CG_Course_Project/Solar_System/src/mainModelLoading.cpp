@@ -56,7 +56,11 @@ int main()
 
 	// Setting shaders
 	ShaderProgram shaderProgram;
-	shaderProgram.loadShaders("res/shaders/lighting-phong-mat-dir-point.vert", "res/shaders/lighting-phong-mat-dir-point.frag");
+	shaderProgram.loadShaders("res/shaders/lighting-phong-mat-point.vert", "res/shaders/lighting-phong-mat-point.frag");
+	
+	//// Setting light shaders
+	//ShaderProgram lightShader;
+	//shaderProgram.loadShaders("res/shaders/lamp.vert", "res/shaders/lamp.frag");
 
 	// Load Models 
 	const int numModels = 10;
@@ -129,11 +133,30 @@ int main()
 		// Create the projection matrix
 		projection = glm::perspective(glm::radians(fpsCamera.getFOV()), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 200.0f);
 
+		// View position to be passed to fragment shader
+		glm::vec3 viewPos;
+		viewPos.x = fpsCamera.getPosition().x;
+		viewPos.y = fpsCamera.getPosition().y;
+		viewPos.z = fpsCamera.getPosition().z;
+
+		// Set light properties (pos, color)
+		glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
+		glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+
 		shaderProgram.use();
 
 		// Pass the matrices to the shader
 		shaderProgram.setUniform("view", view);
 		shaderProgram.setUniform("projection", projection);
+		shaderProgram.setUniform("viewPos", viewPos);
+		// Set Point light
+		shaderProgram.setUniform("pointLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		shaderProgram.setUniform("pointLight.diffuse", lightColor);
+		shaderProgram.setUniform("pointLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+		shaderProgram.setUniform("pointLight.position", lightPos);
+		shaderProgram.setUniform("pointLight.constant", 1);
+		shaderProgram.setUniform("pointLight.linear", 0.07f);
+		shaderProgram.setUniform("pointLight.exponent", 0.108f);
 
 		// Render the scene
 		for (int i = 0; i < numModels; i++)
@@ -141,6 +164,12 @@ int main()
 			glm::mat4 mat = glm::mat4(1.0);
 			// Set the Positions, and Scale for each Model
 			model = glm::translate(mat, modelPos[i]) * glm::scale(mat, modelScale[i]);
+
+			// Set the material properties for models
+			shaderProgram.setUniform("material.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+			shaderProgram.setUniformSampler("material.diffuseMap", 0);
+			shaderProgram.setUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+			shaderProgram.setUniform("material.shininess", 45.0f);
 
 			// Set the Rotations for each planet
 			switch (i)
