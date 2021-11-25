@@ -21,6 +21,9 @@ int gWindowWidth = 1200;
 int gWindowHeight = 900;
 GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
+bool rotatePlanets = true;
+float curAngle = 0.0f;
+float curAngleIncrement = 0.1f;
 
 // Camera Settings
 FPSCamera fpsCamera(glm::vec3(-20.0f, 40.0f, 90.0f), glm::vec3(20.0f, 0.0f, -10.0f));
@@ -80,7 +83,7 @@ int main()
 	// Simulating the stars in the outer space
 	Model star;
 	star.loadModel("res/models/Stars/Star.obj");
-	const int starsNum = 400;
+	const int starsNum = 500;
 	glm::vec3 p[starsNum];
 	glm::vec3 s[starsNum];
 	int min = -100, max = 100;
@@ -105,12 +108,15 @@ int main()
 		if (pZ < 0)
 			pZ -= redArea;
 
-		cout << "(" << pX << ", " << pY << ", " << pZ << ")" << endl; // position of a star
+		cout << "Position: (" << pX << ", " << pY << ", " << pZ << ")" << endl; // position of a star
 
-		float sc = rand() % (1 - 0 + 1) + 0;
+		float sc = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		sc = (sc / (sc + 1)) + 0.1;
+
+		cout << "Scale: (" << sc << ", " << sc << ", " << sc << ")" << endl; // scale of a star
 
 		p[i] = glm::vec3(pX, pY, pZ);
-		s[i] = glm::vec3(sc + 0.1, sc + 0.1, sc + 0.1);
+		s[i] = glm::vec3(sc , sc, sc);
 	}
 
 	// Model Positions
@@ -142,7 +148,6 @@ int main()
 	};
 
 	double lastTime = glfwGetTime();
-	float curAngle = 0.0f;
 
 	// Rendering loop 
 	while (!glfwWindowShouldClose(gWindow))
@@ -152,7 +157,7 @@ int main()
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
 
-		curAngle += 0.2f;
+		curAngle += curAngleIncrement;
 
 		// Poll for and process events
 		glfwPollEvents();
@@ -207,48 +212,50 @@ int main()
 			shaderProgram.setUniform("material.specular", glm::vec3(0.0f, 0.0f, 0.0f));
 			shaderProgram.setUniform("material.shininess", 45.0f);
 
-			// Set the Rotations for each planet
-			switch (i)
-			{
-				//case 0: // Sun
-				//	model = model * glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-				//	break;
-			case 1: // Mercury
-				model = glm::rotate(mat, glm::radians(-curAngle * 1.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 2: // Venus
-				model = glm::rotate(mat, glm::radians(-curAngle * 1.2f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(curAngle * 1.5f), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 3: // Earth
-				model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 4: // Earth - Moon
-				model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(-curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 5: // Mars
-				model = glm::rotate(mat, glm::radians(-curAngle * 2.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(-curAngle * 4), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 6: // Ceres
-				model = glm::rotate(mat, glm::radians(-curAngle * 3.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 7: // Saturn
-				model = glm::rotate(mat, glm::radians(-curAngle * 4.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 8: // Uranus
-				model = glm::rotate(mat, glm::radians(-curAngle * 3.7f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
-			case 9: // Neptune
-				model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
-					* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
-				break;
+			if (rotatePlanets) { // If the user Press R ==> start moving
+				// Set the Rotations for each planet
+				switch (i)
+				{
+					//case 0: // Sun
+					//	model = model * glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+					//	break;
+				case 1: // Mercury
+					model = glm::rotate(mat, glm::radians(-curAngle * 1.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 2: // Venus
+					model = glm::rotate(mat, glm::radians(-curAngle * 1.2f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(curAngle * 1.5f), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 3: // Earth
+					model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 4: // Earth - Moon
+					model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(-curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 5: // Mars
+					model = glm::rotate(mat, glm::radians(-curAngle * 2.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(-curAngle * 4), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 6: // Ceres
+					model = glm::rotate(mat, glm::radians(-curAngle * 3.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 7: // Saturn
+					model = glm::rotate(mat, glm::radians(-curAngle * 4.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 8: // Uranus
+					model = glm::rotate(mat, glm::radians(-curAngle * 3.7f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				case 9: // Neptune
+					model = glm::rotate(mat, glm::radians(-curAngle * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
+						* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
+					break;
+				}
 			}
 			shaderProgram.setUniform("model", model);
 
@@ -357,6 +364,21 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		else
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	
+	if (key == GLFW_KEY_R && action == GLFW_PRESS)
+	{
+		rotatePlanets = !rotatePlanets;
+	}
+	
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+	{
+		curAngleIncrement += 0.05f;
+	}
+	
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+	{
+		curAngleIncrement -= 0.05f;
 	}
 }
 
