@@ -23,14 +23,14 @@ GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
 bool rotatePlanets = true;
 float curAngle = 0.0f;
-float curAngleIncrement = 0.1f;
+float angleIncrement = 0.1f;
 
 // Camera Settings
 FPSCamera fpsCamera(glm::vec3(-20.0f, 40.0f, 90.0f), glm::vec3(20.0f, 0.0f, -10.0f));
 
 // Control Settings
-const double ZOOM_SENSITIVITY = -3.0;
-const float MOVE_SPEED = 10.0; // units per second
+const double ZOOM_SENSITIVITY = -3.0f;
+const float MOVE_SPEED = 10.0f; // units per second
 const float MOUSE_SENSITIVITY = 0.1f;
 
 // Functions prototypes
@@ -87,7 +87,7 @@ int main()
 	glm::vec3 p[starsNum];
 	glm::vec3 s[starsNum];
 	int min = -100, max = 100;
-	int redArea = 30; // Range from -50 to 50 on x, y, z should not have any stars 
+	int redArea = 25; // Range from -50 to 50 on x, y, z should not have any stars 
 	for (int i = 0; i < starsNum; i++)
 	{
 		float pX = rand() % (max - min + 1) + min;
@@ -123,9 +123,9 @@ int main()
 	glm::vec3 modelPos[] = {
 		glm::vec3(0.0f, 0.0f, 0.0f), // The Sun (Light)
 		glm::vec3(10.0f, 0.0f, 0.0f), // Mercury
-		glm::vec3(18.0f, 0.0f, 0.0f), // Venus
-		glm::vec3(24.0f, 0.0f, 0.0f), // Earth - Moon
-		glm::vec3(29.0f, 0.0f, 0.0f), // Earth
+		glm::vec3(15.0f, 0.0f, 0.0f), // Venus
+		glm::vec3(23.0f, 0.0f, 0.0f), // Earth - Moon
+		glm::vec3(28.0f, 0.0f, 0.0f), // Earth
 		glm::vec3(32.0f, 0.0f, 0.0f), // Mars
 		glm::vec3(44.0f, 0.0f, 0.0f), // Ceres
 		glm::vec3(60.0f, 0.0f, 0.0f), // Saturn
@@ -157,7 +157,7 @@ int main()
 		double currentTime = glfwGetTime();
 		double deltaTime = currentTime - lastTime;
 
-		curAngle += curAngleIncrement;
+		curAngle += angleIncrement;
 
 		// Poll for and process events
 		glfwPollEvents();
@@ -216,9 +216,9 @@ int main()
 				// Set the Rotations for each planet
 				switch (i)
 				{
-					//case 0: // Sun
-					//	model = model * glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
-					//	break;
+				//case 0: // Sun
+				//	model = model * glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(0.0f, 1.0f, 0.0f));
+				//	break;
 				case 1: // Mercury
 					model = glm::rotate(mat, glm::radians(-curAngle * 1.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model
 						* glm::rotate(mat, glm::radians(curAngle * 6), glm::vec3(1.0f, 1.0f, 0.0f));
@@ -256,6 +256,9 @@ int main()
 						* glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
 					break;
 				}
+			}
+			else {
+				model = model * glm::rotate(mat, glm::radians(curAngle * 2), glm::vec3(1.0f, 1.0f, 0.0f));
 			}
 			shaderProgram.setUniform("model", model);
 
@@ -373,12 +376,12 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 	
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS)
 	{
-		curAngleIncrement += 0.05f;
+		angleIncrement += 0.05f;
 	}
 	
 	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
 	{
-		curAngleIncrement -= 0.05f;
+		angleIncrement -= 0.05f;
 	}
 }
 
