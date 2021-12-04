@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "11_Lighting_Phong", "11_Lig
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_Lighting_Material", "12_Lighting_Material\12_Lighting_Material.vcxproj", "{0DBCE62B-E805-468C-AAA2-8BA33884E311}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "13_Exam_Review", "13_Exam_Review\13_Exam_Review.vcxproj", "{89140BA2-9459-4855-813E-0F5DB9E131A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -131,6 +133,14 @@ Global
 		{0DBCE62B-E805-468C-AAA2-8BA33884E311}.Release|x64.Build.0 = Release|x64
 		{0DBCE62B-E805-468C-AAA2-8BA33884E311}.Release|x86.ActiveCfg = Release|Win32
 		{0DBCE62B-E805-468C-AAA2-8BA33884E311}.Release|x86.Build.0 = Release|Win32
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Debug|x64.ActiveCfg = Debug|x64
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Debug|x64.Build.0 = Debug|x64
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Debug|x86.ActiveCfg = Debug|Win32
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Debug|x86.Build.0 = Debug|Win32
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Release|x64.ActiveCfg = Release|x64
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Release|x64.Build.0 = Release|x64
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Release|x86.ActiveCfg = Release|Win32
+		{89140BA2-9459-4855-813E-0F5DB9E131A3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
