@@ -297,3 +297,46 @@ int main() {
 	Wrapping and Filtering are defined using the glTexParameteri() function.
 
 */
+
+// Transformations
+/*
+	
+ 1- Translation Matrix:
+	1 0 0 d_x
+	0 1 0 d_y
+	0 0 1 d_z
+	0 0 0 1
+
+ 2- Rotation Matrix:
+
+	about Z:
+	cos() -sin() 0 0
+	sin() cos()  0 0
+	0		0	 1 0
+	0		0	 0 1
+
+	about X:
+	1	0		0  0
+	0 cos() -sin() 0
+	0 sin() cos()  0
+	0	0	 0	   1
+
+	about Y:
+	cos() 0 -sin()  0
+	0   1		0	0
+	sin() 0  cos()  0
+	0	0	   0    1
+
+ 3- Scaling:
+	S_x 0 0 0
+	0 S_y 0 0
+	0 0 S_z 0
+	0 0 0	1
+
+
+ 4- Reflect:
+	
+	on x : y = -y
+	on y : x = -x
+
+*/

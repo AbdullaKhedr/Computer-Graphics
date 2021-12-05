@@ -272,7 +272,14 @@ int main()
 	*	* Gouraud shading is more realistic than phong.
 	*	 
 	* 
+	*	Faceted or Flat shading.
+	*	Computations made per-primitive (e.g., per triangle).
 	* 
+	*	Smooth shading: (All require the presence of surface normal vectors)
+	*		Gouraud:ADS computations done per vertex, then interpolated by the rasterizer.
+	*		Phong: Normal vectors interpolated by rasterizer, then ADS computations done per fragment.
+	*		Blinn-Phong: Same as Phong shading (above), with reflection computation slightly optimized for performance.
+	*	
 	* 
 	* 
 	* 
